@@ -1,0 +1,459 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --bg: #f2f7f1;
+  --bg-strong: #e4efe1;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #ffffff;
+  --text: #183227;
+  --muted: #5f7569;
+  --green: #4c8c5e;
+  --green-strong: #2c6b41;
+  --green-soft: #dcebd8;
+  --border: rgba(42, 88, 60, 0.12);
+  --shadow: 0 24px 60px rgba(35, 63, 44, 0.12);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(120, 172, 122, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(76, 140, 94, 0.14), transparent 26%),
+    linear-gradient(180deg, var(--bg), #eef5eb 50%, #edf3ea 100%);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(76, 140, 94, 0.28);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.topbar h1,
+.hero h2,
+.panel h2 {
+  margin: 0;
+  line-height: 1.08;
+}
+
+.topbar h1 {
+  font-size: clamp(2rem, 3vw, 3.4rem);
+  max-width: 12ch;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--green-strong);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-link,
+.primary-btn,
+.secondary-btn,
+.ghost-btn,
+.filter-chip,
+.listing-card,
+.meetup-card,
+.conversation-item,
+.pin {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.nav-link,
+.secondary-btn,
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  padding: 10px 16px;
+  border-color: var(--border);
+}
+
+.nav-link.router-link-active {
+  background: var(--green-soft);
+  border-color: rgba(76, 140, 94, 0.24);
+}
+
+.workspace {
+  display: grid;
+  gap: 24px;
+}
+
+.page-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 20px;
+}
+
+.content-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel,
+.listing-card,
+.meetup-card,
+.conversation-item {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.panel {
+  padding: 24px;
+  border-radius: var(--radius-xl);
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  background:
+    linear-gradient(135deg, rgba(76, 140, 94, 0.16), rgba(255, 255, 255, 0.76)),
+    var(--surface);
+}
+
+.lead,
+.muted,
+.listing-desc,
+.meetup-card p,
+.conversation-item p {
+  color: var(--muted);
+}
+
+.hero-actions,
+.filters,
+.inline-stats,
+.tag-row,
+.factor-list,
+.meetup-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--green), var(--green-strong));
+  color: white;
+  padding: 12px 18px;
+  box-shadow: 0 16px 30px rgba(44, 107, 65, 0.22);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.filters {
+  align-items: center;
+}
+
+.filters input,
+.composer input {
+  width: min(100%, 340px);
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+}
+
+.filter-chip,
+.tag,
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-soft);
+  color: var(--green-strong);
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.filter-chip.active {
+  background: var(--green);
+  color: white;
+}
+
+.listing-grid,
+.conversation-list,
+.meetup-list {
+  display: grid;
+  gap: 12px;
+}
+
+.listing-card,
+.meetup-card,
+.conversation-item {
+  width: 100%;
+  text-align: left;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.listing-card.selected,
+.meetup-card.selected,
+.conversation-item.active,
+.pin.active {
+  border-color: rgba(76, 140, 94, 0.42);
+  background: rgba(232, 243, 230, 0.92);
+}
+
+.listing-top,
+.listing-meta,
+.meetup-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.listing-card h3,
+.meetup-card strong,
+.conversation-item strong {
+  margin: 12px 0 8px;
+}
+
+.listing-meta {
+  margin: 14px 0;
+}
+
+.tag-row .tag {
+  border-radius: 999px;
+}
+
+.map-explorer {
+  min-height: 420px;
+}
+
+.map-canvas {
+  position: relative;
+  min-height: 340px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background:
+    linear-gradient(120deg, rgba(180, 214, 177, 0.2), rgba(255, 255, 255, 0.28)),
+    linear-gradient(90deg, rgba(76, 140, 94, 0.14) 1px, transparent 1px),
+    linear-gradient(rgba(76, 140, 94, 0.14) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+}
+
+.map-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(76, 140, 94, 0.12), transparent 12%),
+    radial-gradient(circle at 75% 65%, rgba(76, 140, 94, 0.18), transparent 16%);
+}
+
+.pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 10px 12px;
+  background: white;
+  color: var(--text);
+  box-shadow: 0 10px 20px rgba(23, 50, 39, 0.14);
+}
+
+.pin span {
+  display: block;
+  max-width: 18ch;
+}
+
+.fallback-copy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 24px;
+}
+
+.thread {
+  display: grid;
+  gap: 12px;
+  max-height: 420px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.bubble.buyer {
+  justify-self: end;
+  background: rgba(76, 140, 94, 0.12);
+}
+
+.bubble.seller {
+  justify-self: start;
+}
+
+.bubble.system {
+  justify-self: center;
+  background: rgba(223, 233, 218, 0.76);
+}
+
+.message-meta {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.composer {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.composer input {
+  flex: 1;
+  max-width: none;
+}
+
+.factor-list {
+  flex-direction: column;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.factor-list li,
+.inline-stats span,
+.meetup-meta span {
+  display: inline-flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 960px) {
+  .topbar,
+  .hero,
+  .panel-head,
+  .content-grid,
+  .content-grid.compact,
+  .composer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar {
+    align-items: stretch;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .content-grid,
+  .content-grid.compact {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .panel,
+  .listing-card,
+  .meetup-card,
+  .conversation-item {
+    border-radius: 20px;
+  }
+
+  .bubble {
+    max-width: 92%;
+  }
+}
