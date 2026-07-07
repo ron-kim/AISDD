@@ -18,6 +18,18 @@ function sellerName(listingId: string) {
   const sellerId = marketStore?.listings.find((item) => item.id === listingId)?.sellerId ?? 's1'
   return sellers[sellerId]?.name ?? t('common.unknownSeller')
 }
+
+function handleCountyChange(event: Event) {
+  const target = event.target as HTMLSelectElement | null
+  if (!target) return
+  marketStore?.setCountyFilter(target.value)
+}
+
+function handleDistrictChange(event: Event) {
+  const target = event.target as HTMLSelectElement | null
+  if (!target) return
+  marketStore?.setDistrictFilter(target.value)
+}
 </script>
 
 <template>
@@ -62,6 +74,31 @@ function sellerName(listingId: string) {
           {{ category.label }}
         </button>
       </div>
+      <div class="location-filters">
+        <label class="filter-field">
+          <span>{{ t('filters.county') }}</span>
+          <select :value="marketStore.countyFilter" @change="handleCountyChange">
+            <option v-for="option in marketStore.countyOptions" :key="option.id" :value="option.id">
+              {{ option.label }}
+            </option>
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>{{ t('filters.district') }}</span>
+          <select
+            :value="marketStore.districtFilter"
+            :disabled="marketStore.countyFilter === 'all'"
+            @change="handleDistrictChange"
+          >
+            <option v-if="marketStore.countyFilter === 'all'" value="all">
+              {{ t('filters.selectCountyFirst') }}
+            </option>
+            <option v-else v-for="option in marketStore.districtOptions" :key="option.id" :value="option.id">
+              {{ option.label }}
+            </option>
+          </select>
+        </label>
+      </div>
     </section>
 
     <section class="content-grid">
@@ -82,6 +119,7 @@ function sellerName(listingId: string) {
             @select="marketStore.selectListing"
           />
         </div>
+        <p v-if="marketStore.filteredListings.length === 0" class="muted">{{ t('home.noResults') }}</p>
       </SectionCard>
 
       <MapExplorer

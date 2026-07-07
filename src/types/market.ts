@@ -20,6 +20,8 @@ export interface Listing {
   id: string
   title: LocalizedText
   categoryId: CategoryId
+  countyId: string
+  districtId: string
   price: number
   distanceKm: number
   status: ListingStatus
