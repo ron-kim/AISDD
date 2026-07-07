@@ -2,6 +2,7 @@
 import { inject } from 'vue'
 import MapExplorer from '@/components/MapExplorer.vue'
 import SectionCard from '@/components/SectionCard.vue'
+import { t } from '@/composables/locale'
 import type { createMarketStore } from '@/stores/marketStore'
 
 type MarketStore = ReturnType<typeof createMarketStore>
@@ -20,11 +21,11 @@ const marketStore = inject<MarketStore>('marketStore')
     <SectionCard>
       <template #title>
         <div>
-          <p class="eyebrow">Synchronized view</p>
-          <h2>Map and list stay aligned</h2>
+          <p class="eyebrow">{{ t('map.panelEyebrow') }}</p>
+          <h2>{{ t('map.panelTitle') }}</h2>
         </div>
       </template>
-      <p class="muted">Selecting a pin updates the listing focus, trust view, chat flow, and meetup suggestions.</p>
+      <p class="muted">{{ t('map.panelBody') }}</p>
     </SectionCard>
   </div>
 </template>

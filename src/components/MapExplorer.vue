@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { text, t } from '@/composables/locale'
 import type { Listing } from '@/types/market'
 
 defineProps<{
@@ -16,11 +17,11 @@ defineEmits<{
   <section class="map-explorer panel">
     <div class="panel-head">
       <div>
-        <p class="eyebrow">Map exploration</p>
-        <h2>Nearby listings</h2>
+        <p class="eyebrow">{{ t('map.eyebrow') }}</p>
+        <h2>{{ t('map.title') }}</h2>
       </div>
       <span class="score-badge" :class="{ warning: locationMode === 'denied' }">
-        {{ locationMode === 'granted' ? 'Location on' : 'Location off' }}
+        {{ locationMode === 'granted' ? t('map.locationOn') : t('map.locationOff') }}
       </span>
     </div>
 
@@ -35,12 +36,12 @@ defineEmits<{
           :style="{ left: `${listing.coordinates.x}%`, top: `${listing.coordinates.y}%` }"
           @click="$emit('select', listing.id)"
         >
-          <span>{{ listing.title }}</span>
+          <span>{{ text(listing.title) }}</span>
         </button>
       </template>
       <div v-else class="fallback-copy">
-        <h3>Location is off, but browsing still works</h3>
-        <p>Use search and the listing cards to explore manually, or re-enable location later.</p>
+        <h3>{{ t('map.fallbackTitle') }}</h3>
+        <p>{{ t('map.fallbackBody') }}</p>
       </div>
     </div>
   </section>

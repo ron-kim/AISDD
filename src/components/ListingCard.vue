@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { categoryLabel, formatCurrency, text } from '@/composables/locale'
 import type { Listing } from '@/types/market'
 
 defineProps<{
@@ -13,17 +14,17 @@ defineEmits<{ select: [id: string] }>()
 <template>
   <button class="listing-card" :class="{ selected }" @click="$emit('select', listing.id)">
     <div class="listing-top">
-      <span class="chip">{{ listing.category }}</span>
+      <span class="chip">{{ categoryLabel(listing.categoryId) }}</span>
       <span class="distance">{{ listing.distanceKm }} km</span>
     </div>
-    <h3>{{ listing.title }}</h3>
-    <p class="listing-desc">{{ listing.description }}</p>
+    <h3>{{ text(listing.title) }}</h3>
+    <p class="listing-desc">{{ text(listing.description) }}</p>
     <div class="listing-meta">
-      <strong>NT$ {{ listing.price.toLocaleString() }}</strong>
+      <strong>{{ formatCurrency(listing.price) }}</strong>
       <span>{{ sellerName }}</span>
     </div>
     <div class="tag-row">
-      <span v-for="tag in listing.tags" :key="tag" class="tag">{{ tag }}</span>
+      <span v-for="tag in listing.tags" :key="text(tag)" class="tag">{{ text(tag) }}</span>
     </div>
   </button>
 </template>

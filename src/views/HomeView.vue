@@ -5,6 +5,7 @@ import ListingCard from '@/components/ListingCard.vue'
 import MapExplorer from '@/components/MapExplorer.vue'
 import SectionCard from '@/components/SectionCard.vue'
 import { sellers } from '@/data/mockMarket'
+import { formatDistance, t, text } from '@/composables/locale'
 import type { createMarketStore } from '@/stores/marketStore'
 import type { Listing } from '@/types/market'
 
@@ -15,7 +16,7 @@ const topListing = computed<Listing | undefined>(() => marketStore?.activeListin
 
 function sellerName(listingId: string) {
   const sellerId = marketStore?.listings.find((item) => item.id === listingId)?.sellerId ?? 's1'
-  return sellers[sellerId]?.name ?? '未知賣家'
+  return sellers[sellerId]?.name ?? t('common.unknownSeller')
 }
 </script>
 
@@ -23,44 +24,42 @@ function sellerName(listingId: string) {
   <div v-if="marketStore" class="page-grid">
     <section class="hero panel">
       <div>
-        <p class="eyebrow">在地化・永續・社區信任</p>
-        <h2>把二手交易做成鄰里中的日常協作</h2>
-        <p class="lead">
-          從附近商品、賣家信任分數到面交點建議，所有互動都優先支援面交與鄰近交易。
-        </p>
+        <p class="eyebrow">{{ t('home.heroEyebrow') }}</p>
+        <h2>{{ t('home.heroTitle') }}</h2>
+        <p class="lead">{{ t('home.heroLead') }}</p>
       </div>
       <div class="hero-actions">
-        <RouterLink to="/map" class="primary-btn">開啟地圖</RouterLink>
-        <RouterLink to="/chat" class="secondary-btn">查看訊息</RouterLink>
+        <RouterLink to="/map" class="primary-btn">{{ t('home.openMap') }}</RouterLink>
+        <RouterLink to="/chat" class="secondary-btn">{{ t('home.openChat') }}</RouterLink>
       </div>
     </section>
 
     <section class="panel">
       <div class="panel-head">
         <div>
-          <p class="eyebrow">搜尋與篩選</p>
-          <h2>附近商品</h2>
+          <p class="eyebrow">{{ t('home.searchTitle') }}</p>
+          <h2>{{ t('home.searchTitle') }}</h2>
         </div>
         <button
           class="ghost-btn"
           @click="marketStore.setLocationMode(marketStore.locationMode === 'granted' ? 'denied' : 'granted')"
         >
-          {{ marketStore.locationMode === 'granted' ? '關閉定位' : '開啟定位' }}
+          {{ marketStore.locationMode === 'granted' ? t('home.locationEnabled') : t('home.locationDisabled') }}
         </button>
       </div>
       <div class="filters">
         <label>
-          <span class="sr-only">搜尋商品</span>
-          <input v-model="marketStore.searchTerm" type="search" placeholder="搜尋家具、家飾、收納..." />
+          <span class="sr-only">{{ t('home.searchTitle') }}</span>
+          <input v-model="marketStore.searchTerm" type="search" :placeholder="t('common.searchPlaceholder')" />
         </label>
         <button
           v-for="category in marketStore.categories"
-          :key="category"
+          :key="category.id"
           class="filter-chip"
-          :class="{ active: category === marketStore.categoryFilter }"
-          @click="marketStore.categoryFilter = category"
+          :class="{ active: category.id === marketStore.categoryFilter }"
+          @click="marketStore.categoryFilter = category.id"
         >
-          {{ category }}
+          {{ category.label }}
         </button>
       </div>
     </section>
@@ -69,8 +68,8 @@ function sellerName(listingId: string) {
       <SectionCard>
         <template #title>
           <div>
-            <p class="eyebrow">清單</p>
-            <h2>鄰近商品</h2>
+            <p class="eyebrow">{{ t('home.searchTitle') }}</p>
+            <h2>{{ t('home.searchTitle') }}</h2>
           </div>
         </template>
         <div class="listing-grid">
@@ -97,27 +96,29 @@ function sellerName(listingId: string) {
       <section class="panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">焦點商品</p>
-            <h2>{{ topListing?.title }}</h2>
+            <p class="eyebrow">{{ t('home.selectedTitle') }}</p>
+            <h2>{{ text(topListing?.title) }}</h2>
           </div>
-          <RouterLink v-if="topListing" :to="`/listings/${topListing.id}`" class="secondary-btn">查看詳情</RouterLink>
+          <RouterLink v-if="topListing" :to="`/listings/${topListing.id}`" class="secondary-btn">
+            {{ t('common.viewDetails') }}
+          </RouterLink>
         </div>
-        <p class="muted">{{ topListing?.description }}</p>
+        <p class="muted">{{ text(topListing?.description) || t('home.emptyLead') }}</p>
         <div class="inline-stats">
-          <span>距離 {{ topListing?.distanceKm }} km</span>
-          <span>面交提示：{{ topListing?.meetupHint }}</span>
+          <span>{{ formatDistance(topListing?.distanceKm ?? 0) }}</span>
+          <span>{{ text(topListing?.meetupHint) }}</span>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">社區動態</p>
-            <h2>即時協調</h2>
+            <p class="eyebrow">{{ t('home.supportEyebrow') }}</p>
+            <h2>{{ t('home.supportTitle') }}</h2>
           </div>
         </div>
-        <p class="muted">從商品頁直接進入對話，快速確認細節與面交時間。</p>
-        <RouterLink to="/chat" class="primary-btn">前往聊天</RouterLink>
+        <p class="muted">{{ t('home.supportBody') }}</p>
+        <RouterLink to="/chat" class="primary-btn">{{ t('home.openChat') }}</RouterLink>
       </section>
     </section>
   </div>

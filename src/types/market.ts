@@ -1,44 +1,51 @@
+export type Locale = 'zh-TW' | 'en'
 export type ListingStatus = 'ready-today' | 'reserved' | 'active'
 export type MessageState = 'sending' | 'sent' | 'delivered'
+export type CategoryId = 'furniture' | 'decor' | 'storage'
+
+export interface LocalizedText {
+  'zh-TW': string
+  en: string
+}
 
 export interface SellerProfile {
   name: string
   verified: boolean
-  responseTime: string
+  responseTime: LocalizedText
   completionRate: number
   joinedAt: string
 }
 
 export interface Listing {
   id: string
-  title: string
-  category: string
+  title: LocalizedText
+  categoryId: CategoryId
   price: number
   distanceKm: number
   status: ListingStatus
-  description: string
-  location: string
+  description: LocalizedText
+  location: LocalizedText
   coordinates: { x: number; y: number }
   sellerId: string
-  tags: string[]
-  meetupHint: string
+  tags: LocalizedText[]
+  meetupHint: LocalizedText
 }
 
 export interface TrustFactor {
-  label: string
-  value: string
+  label: LocalizedText
+  value: LocalizedText
 }
 
 export interface TrustProfile {
   score: number
-  summary: string
+  summary: LocalizedText
   factors: TrustFactor[]
 }
 
 export interface Message {
   id: string
   author: 'buyer' | 'seller' | 'system'
-  text: string
+  text: LocalizedText
   time: string
   state?: MessageState
 }
@@ -56,10 +63,10 @@ export interface Conversation {
 
 export interface MeetupSuggestion {
   id: string
-  title: string
-  distance: string
-  safety: string
-  transit: string
-  rationale: string
+  title: LocalizedText
+  distance: LocalizedText
+  safety: LocalizedText
+  transit: LocalizedText
+  rationale: LocalizedText
   rank: number
 }

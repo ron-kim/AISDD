@@ -1,9 +1,14 @@
 import { computed, reactive, ref } from 'vue'
-import { conversations as conversationFixtures, listings as listingFixtures } from '@/data/mockMarket'
+import { categoryOrder, conversations as conversationFixtures, listings as listingFixtures } from '@/data/mockMarket'
+import { categoryLabel, formatClock, t, text } from '@/composables/locale'
 import { marketService } from '@/services/marketService'
-import type { Conversation, Listing, MeetupSuggestion, TrustProfile } from '@/types/market'
+import type { CategoryId, Conversation, Listing, MeetupSuggestion, TrustProfile } from '@/types/market'
 
 export type LocationMode = 'granted' | 'denied'
+
+function localizedText(value: string) {
+  return { 'zh-TW': value, en: value }
+}
 
 export function createMarketStore() {
   const listings = ref<Listing[]>([...listingFixtures])
@@ -11,22 +16,31 @@ export function createMarketStore() {
   const activeListingId = ref<string>(listings.value[0]?.id ?? '')
   const activeConversationId = ref<string>(conversations.value[0]?.id ?? '')
   const searchTerm = ref('')
-  const categoryFilter = ref('全部')
+  const categoryFilter = ref<'all' | CategoryId>('all')
   const locationMode = ref<LocationMode>('granted')
   const selectedMeetupListingId = ref<string>(listings.value[0]?.id ?? '')
   const selectedMeetupPointId = ref<string>('')
   const trustProfiles = reactive<Record<string, TrustProfile | undefined>>({})
   const meetupCache = reactive<Record<string, MeetupSuggestion[]>>({})
 
-  const categories = computed(() => ['全部', ...new Set(listings.value.map((listing) => listing.category))])
+  const categories = computed(() => [
+    { id: 'all' as const, label: t('categories.all') },
+    ...categoryOrder.map((id) => ({ id, label: categoryLabel(id) })),
+  ])
 
   const filteredListings = computed(() => {
     const term = searchTerm.value.trim().toLowerCase()
     return listings.value.filter((listing) => {
-      const matchesCategory = categoryFilter.value === '全部' || listing.category === categoryFilter.value
+      const matchesCategory = categoryFilter.value === 'all' || listing.categoryId === categoryFilter.value
       const matchesTerm =
         term.length === 0 ||
-        [listing.title, listing.category, listing.location, listing.description, ...listing.tags]
+        [
+          text(listing.title),
+          categoryLabel(listing.categoryId),
+          text(listing.location),
+          text(listing.description),
+          ...listing.tags.map((tag) => text(tag)),
+        ]
           .join(' ')
           .toLowerCase()
           .includes(term)
@@ -92,19 +106,20 @@ export function createMarketStore() {
     }
   }
 
-  async function sendMessage(text: string) {
+  async function sendMessage(messageText: string) {
     const current = activeConversation.value
-    if (!current || !text.trim()) return
+    if (!current || !messageText.trim()) return
 
     const sendingId = `msg-${Date.now()}`
+    const now = formatClock()
     current.messages.push({
       id: sendingId,
       author: 'buyer',
-      text,
-      time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+      text: localizedText(messageText),
+      time: now,
       state: 'sending',
     })
-    current.updatedAt = '剛剛'
+    current.updatedAt = now
 
     window.setTimeout(() => {
       const message = current.messages.find((item) => item.id === sendingId)
@@ -115,12 +130,15 @@ export function createMarketStore() {
       current.messages.push({
         id: `${sendingId}-reply`,
         author: 'seller',
-        text: '收到，我們維持公開地點會面比較方便。',
-        time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+        text: {
+          'zh-TW': '可以，我會先確認細節後回覆你。',
+          en: 'Sure, I’ll confirm the details and get back to you.',
+        },
+        time: formatClock(),
         state: 'delivered',
       })
       current.unread += 1
-      current.updatedAt = '剛剛'
+      current.updatedAt = formatClock()
     }, 1600)
   }
 

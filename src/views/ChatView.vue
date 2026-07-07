@@ -3,6 +3,7 @@ import { computed, inject } from 'vue'
 import ChatPanel from '@/components/ChatPanel.vue'
 import SectionCard from '@/components/SectionCard.vue'
 import { sellers } from '@/data/mockMarket'
+import { text, t } from '@/composables/locale'
 import type { createMarketStore } from '@/stores/marketStore'
 
 type MarketStore = ReturnType<typeof createMarketStore>
@@ -12,7 +13,7 @@ const items = computed(() => marketStore?.conversations ?? [])
 
 function sellerResponseTime(listingId: string) {
   const sellerId = listingId === 'cedar-chair' ? 's1' : listingId === 'bamboo-lamp' ? 's2' : 's3'
-  return sellers[sellerId]?.responseTime ?? 'Average response'
+  return text(sellers[sellerId]?.responseTime) || t('common.averageResponse')
 }
 </script>
 
@@ -21,8 +22,8 @@ function sellerResponseTime(listingId: string) {
     <section class="panel">
       <div class="panel-head">
         <div>
-          <p class="eyebrow">Conversation list</p>
-          <h2>Messages</h2>
+          <p class="eyebrow">{{ t('chat.listEyebrow') }}</p>
+          <h2>{{ t('chat.listTitle') }}</h2>
         </div>
       </div>
       <div class="conversation-list">
@@ -37,7 +38,7 @@ function sellerResponseTime(listingId: string) {
             <strong>{{ conversation.sellerName }}</strong>
             <p>{{ sellerResponseTime(conversation.listingId) }}</p>
           </div>
-          <span class="score-badge">{{ conversation.unread }} unread</span>
+          <span class="score-badge">{{ conversation.unread }} {{ t('common.unread') }}</span>
         </button>
       </div>
     </section>
@@ -51,11 +52,11 @@ function sellerResponseTime(listingId: string) {
     <SectionCard>
       <template #title>
         <div>
-          <p class="eyebrow">Status</p>
-          <h2>Coordination notes</h2>
+          <p class="eyebrow">{{ t('chat.statusEyebrow') }}</p>
+          <h2>{{ t('chat.statusTitle') }}</h2>
         </div>
       </template>
-      <p class="muted">Sending state is shown inline. If the connection drops, the draft stays in the box so the user can retry.</p>
+      <p class="muted">{{ t('chat.statusBody') }}</p>
     </SectionCard>
   </div>
 </template>

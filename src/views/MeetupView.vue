@@ -2,6 +2,7 @@
 import { computed, inject } from 'vue'
 import MeetupSuggestions from '@/components/MeetupSuggestions.vue'
 import SectionCard from '@/components/SectionCard.vue'
+import { t } from '@/composables/locale'
 import type { createMarketStore } from '@/stores/marketStore'
 
 type MarketStore = ReturnType<typeof createMarketStore>
@@ -19,9 +20,9 @@ function handleChoose(id: string) {
   <div v-if="marketStore" class="page-grid">
     <section class="hero panel">
       <div>
-        <p class="eyebrow">Meetup suggestions</p>
-        <h2>Public, nearby, and easy to find</h2>
-        <p class="lead">Keep trades simple by choosing a visible location that both people can reach quickly.</p>
+        <p class="eyebrow">{{ t('meetup.eyebrow') }}</p>
+        <h2>{{ t('meetup.title') }}</h2>
+        <p class="lead">{{ t('meetup.lead') }}</p>
       </div>
     </section>
 
@@ -34,11 +35,11 @@ function handleChoose(id: string) {
     <SectionCard>
       <template #title>
         <div>
-          <p class="eyebrow">How it works</p>
-          <h2>Share your choice in chat</h2>
+          <p class="eyebrow">{{ t('meetup.howEyebrow') }}</p>
+          <h2>{{ t('meetup.howTitle') }}</h2>
         </div>
       </template>
-      <p class="muted">The selected meetup point stays in state so it can be shared in conversation or copied for offline coordination.</p>
+      <p class="muted">{{ t('meetup.howBody') }}</p>
     </SectionCard>
   </div>
 </template>
