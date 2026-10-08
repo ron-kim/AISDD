@@ -4,6 +4,7 @@ import ListingView from '@/views/ListingView.vue'
 import ChatView from '@/views/ChatView.vue'
 import MeetupView from '@/views/MeetupView.vue'
 import MapView from '@/views/MapView.vue'
+import AboutView from '@/views/AboutView.vue'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
@@ -11,4 +12,5 @@ export const routes: RouteRecordRaw[] = [
   { path: '/listings/:id', name: 'listing', component: ListingView, props: true },
   { path: '/chat', name: 'chat', component: ChatView },
   { path: '/meetup', name: 'meetup', component: MeetupView },
+  { path: '/about', name: 'about', component: AboutView },
 ]

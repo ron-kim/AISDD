@@ -25,6 +25,7 @@ const { isDark, toggleTheme } = useTheme()
         <RouterLink to="/map" class="nav-link">{{ t('nav.map') }}</RouterLink>
         <RouterLink to="/chat" class="nav-link">{{ t('nav.chat') }}</RouterLink>
         <RouterLink to="/meetup" class="nav-link">{{ t('nav.meetup') }}</RouterLink>
+        <RouterLink to="/about" class="nav-link">{{ t('nav.about') }}</RouterLink>
       </nav>
     </header>
 

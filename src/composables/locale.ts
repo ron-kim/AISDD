@@ -19,6 +19,7 @@ const messages = {
       map: '地圖',
       chat: '聊天',
       meetup: '面交',
+      about: '關於我們',
     },
     theme: {
       light: '淺色模式',
@@ -126,6 +127,19 @@ const messages = {
       howBody: '選定的面交點會保留在狀態中，稍後可以直接在對話裡分享。',
       emptyState: '目前尚無面交建議。',
     },
+    about: {
+      eyebrow: '關於我們',
+      title: 'Ronday Memories',
+      lead: 'Ronday Memories 打造「社區綠二手市集」，讓閒置物品在鄰里之間找到下一位主人。',
+      contactAction: '聯絡我們',
+      missionEyebrow: '我們的理念',
+      missionTitle: '在地、信任、減少浪費',
+      missionBody:
+        '我們相信二手交易應該簡單又安心：用距離找到附近的好物，用信任分數認識賣家，再選擇公開安全的地點面交，讓物品延續價值、減少浪費。',
+      contactEyebrow: '聯絡方式',
+      contactTitle: '歡迎與我們聯繫',
+      contactBody: '合作洽詢、意見回饋或任何問題，都歡迎來信。',
+    },
     trust: {
       eyebrow: '賣家信任分數',
       titleFallback: '評分載入中',
@@ -144,6 +158,7 @@ const messages = {
       map: 'Map',
       chat: 'Chat',
       meetup: 'Meetup',
+      about: 'About',
     },
     theme: {
       light: 'Light mode',
@@ -250,6 +265,19 @@ const messages = {
       howTitle: 'Share your choice in chat',
       howBody: 'The selected meetup point stays in state so it can be shared in conversation later.',
       emptyState: 'No meetup suggestions yet.',
+    },
+    about: {
+      eyebrow: 'About us',
+      title: 'Ronday Memories',
+      lead: 'Ronday Memories builds Community Green Marketplace, helping unused items find their next owner within the neighborhood.',
+      contactAction: 'Contact us',
+      missionEyebrow: 'Our mission',
+      missionTitle: 'Local, trusted, and less waste',
+      missionBody:
+        'We believe secondhand trading should be simple and safe: find nearby items by distance, get to know sellers through trust scores, and meet in public places so things keep their value instead of becoming waste.',
+      contactEyebrow: 'Contact',
+      contactTitle: 'Get in touch',
+      contactBody: 'For partnerships, feedback, or any questions, send us an email.',
     },
     trust: {
       eyebrow: 'Seller trust score',
