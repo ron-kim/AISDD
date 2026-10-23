@@ -142,7 +142,7 @@ def build_oneway_rows(flights):
 
 def build_rt_rows():
     rows, seen = [], set()
-    for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json'))):
+    for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json')) + glob.glob(os.path.join(HERE, 'raw_rt', '*.json.prev'))):
         try: data = json.load(open(f))
         except Exception: continue
         dec = lambda v: json.loads(v) if isinstance(v, str) else (v or [])  # eval 結果是 JSON 字串
