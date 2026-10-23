@@ -164,6 +164,17 @@ def build_rt_rows():
                 rows.append(make_row(c, ob, rb, None, None, rt_price=rb['price']))
     return rows
 
+def missing_rt():
+    """抓取不完整的來回票查詢（無去程清單或點選後無回程清單）。"""
+    miss = []
+    for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json'))):
+        d = json.load(open(f))
+        picks = [json.loads(v) if isinstance(v, str) else v for v in (d.get('picks') or {}).values()]
+        if not picks or not all(picks):
+            n = os.path.basename(f)[:-5].split('-')
+            miss.append(f"{n[0]}-{n[1]} {int(n[3])}/{int(n[4])}→{int(n[6])}/{int(n[7])}" + ('' if picks and any(picks) else '(全缺)'))
+    return miss
+
 def price_cell(r, key):
     if r['rt'] is not None: return f"來回 {r['rt']:,}" if key == 'out_price' else '—'
     return f"{r[key]:,}"
@@ -198,7 +209,7 @@ tr.top td{{background:#c8f0c8}} tr.rt td{{background:#cfe3ff}} .chip{{padding:1p
 <h1>{title}</h1><div class='sub'>{subtitle}</div><div class='sub'>日期組：{legend}　<span class='chip' style='background:#c8f0c8'>前3名</span><span class='chip' style='background:#cfe3ff'>來回票</span></div>
 <table><tr>{head}</tr>{trs(rows, start=start)}</table>{extra}
 <div class='foot'>總價＝去程＋回程＋行李(每段1件)＋機場⇄首爾站來回交通，單位 NT$，匯率 1 TWD = {KRW_PER_TWD} KRW。行李後加 * 表示含未確認／估算值。<br>交通：{tr_note}<br>
-到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（2026-10-23 抓取，單程與來回）。</div>
+到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（2026-10-23 抓取，單程與來回）。TSA 只有飛 GMP 的直飛；CJJ 查無台北直飛。<br>來回票未抓完整（無前一版可沿用）：{'、'.join(missing_rt()) or '無'}</div>
 </body></html>"""
 
 def main():
