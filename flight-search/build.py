@@ -145,8 +145,10 @@ def build_rt_rows():
     for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json'))):
         try: data = json.load(open(f))
         except Exception: continue
-        outs = data.get('out') or []
+        dec = lambda v: json.loads(v) if isinstance(v, str) else (v or [])  # eval 結果是 JSON 字串
+        outs = dec(data.get('out'))
         for idx, rets in (data.get('picks') or {}).items():
+            rets = dec(rets)
             ob = parse(outs[int(idx)].replace('來回總價 ', ''))
             if not ob: continue
             for s in rets:
