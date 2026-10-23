@@ -90,7 +90,7 @@ def main():
     th = ''.join(f'<th>{night_label(n)}<br>最低／中位／3–4★</th>' for n in NIGHTS)
     trs = []
     for a in AREAS:
-        tds = ''.join(f"<td class='num'>{cell(data.get((a, n)), 'min')}<br><b>{cell(data.get((a, n)), 'med')}</b><br>{cell(data.get((a, n)), 'med34')}</td>" for n in NIGHTS)
+        tds = ''.join(f"<td class='num'>{cell(data.get((a, n)), 'min')}<br><b>{cell(data.get((a, n)), 'med')}</b><br>{cell(data.get((a, n)), 'med34')}<br><span class='s'>n={data.get((a, n), {}).get('n', 0)}</span></td>" for n in NIGHTS)
         trs.append(f"<tr><td><b>{a}</b> <span class='s'>({RESOLVED.get(a, '?')})</span><br><span class='s'>{AREA_NOTE[a]}</span></td>{tds}</tr>")
     cth = ''.join(f"<th>{night_label(c[0])}-{night_label(c[1])}<br>{len([n for n in NIGHTS if c[0] <= n < c[1]])}晚</th>" for c in COMBOS)
     ctr = []
@@ -102,7 +102,7 @@ body{{font-family:'WenQuanYi Zen Hei',sans-serif;margin:16px;background:#fff;col
 h1{{font-size:20px;margin:0 0 4px}} h2{{font-size:16px;margin:18px 0 6px}} .sub,.s{{color:#555}} .s{{font-size:11px}}
 table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px}} th{{background:#333;color:#fff;font-weight:normal}}
 .num{{text-align:right}} .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1100px}}</style></head><body>
-<h1>首爾各區跨年房價（每晚，NT$）</h1><div class='sub'>Google 飯店搜尋第一頁（約 20 間／區），單晚查詢；每格：最低／<b>中位數</b>／3–4 星中位數</div>
+<h1>首爾各區跨年房價（每晚，NT$）</h1><div class='sub'>Google 飯店搜尋第一頁（每區 5–18 間有價格，n＝樣本數），單晚查詢；每格：最低／<b>中位數</b>／3–4 星中位數</div>
 <table><tr><th>區域</th>{th}</tr>{''.join(trs)}</table>
 <h2>各日期組住宿總價（3–4 星中位數加總）</h2><table><tr><th>區域</th>{cth}</tr>{''.join(ctr)}</table>
 <div class='foot'>匯率 1 USD = {TWD_PER_USD} TWD（Google 以 USD 顯示後換算）；房價為 Google 顯示的每晚最低價，含稅與否依各通路而定。查詢時預設 2 位房客的一般客房（單人入住房價通常相同）。
