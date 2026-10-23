@@ -36,6 +36,7 @@ COMBO_COLOR = ['#fde2e4', '#fff1c1', '#e2f0cb', '#d7e3fc', '#f1d4f7', '#ffd6a5',
 def combo_label(c): return f"{int(c[0][5:7])}/{int(c[0][8:])}-{int(c[1][5:7])}/{int(c[1][8:])}"
 
 MIN_STAY = 24
+PAGE = 150  # 早去晚回排行每張 PNG 的列數
 EARLY_OUT = time(9, 30)
 LATE_RET = time(18, 0)
 
@@ -167,10 +168,10 @@ def price_cell(r, key):
 
 COLS = ['名次', '日期組', '總價', '去程票價', '回程票價', '行李', '交通', '去程', '到達市區', '回程', '離開市區', '停留時數', '備註']
 
-def html_table(title, subtitle, rows, extra_title=None, extra_rows=None):
-    def trs(rs, ranked=True):
+def html_table(title, subtitle, rows, extra_title=None, extra_rows=None, start=1):
+    def trs(rs, ranked=True, start=1):
         out = []
-        for i, r in enumerate(rs, 1):
+        for i, r in enumerate(rs, start):
             cls = 'top' if ranked and i <= 3 else ('rt' if r['rt'] is not None else '')
             ci = COMBOS.index(r['combo'])
             bag = f"{r['bag']:,}" + ('*' if r['bag_unconfirmed'] else '')
@@ -193,7 +194,7 @@ th{{background:#333;color:#fff}} .num{{text-align:right}} .b{{font-weight:bold}}
 tr.top td{{background:#c8f0c8}} tr.rt td{{background:#cfe3ff}} .chip{{padding:1px 6px;border-radius:8px;border:1px solid #999;margin-right:3px}}
 .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5}}</style></head><body>
 <h1>{title}</h1><div class='sub'>{subtitle}</div><div class='sub'>日期組：{legend}　<span class='chip' style='background:#c8f0c8'>前3名</span><span class='chip' style='background:#cfe3ff'>來回票</span></div>
-<table><tr>{head}</tr>{trs(rows)}</table>{extra}
+<table><tr>{head}</tr>{trs(rows, start=start)}</table>{extra}
 <div class='foot'>總價＝去程＋回程＋行李(每段1件)＋機場⇄首爾站來回交通，單位 NT$，匯率 1 TWD = {KRW_PER_TWD} KRW。行李後加 * 表示含未確認／估算值。<br>交通：{tr_note}<br>
 到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（2026-10-23 抓取，單程與來回）。</div>
 </body></html>"""
@@ -213,8 +214,13 @@ def main():
                         'Y' if r['bag_unconfirmed'] else '', r['transport'], r['out'], r['arrive'], r['ret'], r['leave'], r['stay'],
                         'Y' if r['early_late'] else '', 'Y' if r['rt'] is not None else '', r['note']])
     sub = '1 成人經濟艙・只看直飛・TPE/TSA ⇄ ICN/GMP/CJJ/TAE/PUS・12/31–1/4 涵蓋 1/2 或 1/3・停留 ≥ 24 小時'
-    open(os.path.join(HERE, 'rank_early_late.html'), 'w').write(
-        html_table(f'早去晚回排行（去程 ≤09:30、回程 ≥18:00，共 {len(early)} 案）', sub, early))
+    title = f'早去晚回排行（去程 ≤09:30、回程 ≥18:00，共 {len(early)} 案）'
+    open(os.path.join(HERE, 'rank_early_late.html'), 'w').write(html_table(title, sub, early))
+    for old in glob.glob(os.path.join(HERE, 'rank_early_late_p*.html')): os.remove(old)
+    for p in range(0, max(len(early), 1), PAGE):
+        n = p // PAGE + 1
+        open(os.path.join(HERE, f'rank_early_late_p{n}.html'), 'w').write(
+            html_table(f'{title}　第 {n} 頁（第 {p + 1}–{min(p + PAGE, len(early))} 名）', sub, early[p:p + PAGE], start=p + 1))
     open(os.path.join(HERE, 'rank_all.html'), 'w').write(
         html_table(f'不限時間排行（總價前 60 名／共 {len(rows)} 案）', sub, top60, f'所有來回票方案（{len(rts)} 案）', rts))
     print(f'flights={len(flights)} rows={len(rows)} early={len(early)} rt={len(rts)}')
