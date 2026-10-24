@@ -18,7 +18,7 @@ HOTELS = {  # key → (顯示名, 位置, Google 評論數)
     'ninetree': ('Nine Tree by Parnas 仁寺洞', '鐘路・仁寺洞', 1500),
 }
 EXCLUDE_ROOM = re.compile(r'宿舍|床位|膠囊|Dorm|Capsule|女性|Female|Women|共用|Shared', re.I)
-SIZE = re.compile(r'平方公尺|最多可住|張.{0,4}床')
+SIZE = re.compile(r'平方公尺|最多可住')
 
 def parse_grid(grid):
     """回傳 [{name, prices[], sold_out}]，name 為房型名稱（下一行是坪數／床型）。"""
