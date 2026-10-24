@@ -22,6 +22,10 @@ HOTELS = {
     'Mangrove Dongdaemun': ('Mangrove 東大門', '中區・東大門歷史文化公園站（鄰近）', False),
     'Nine Tree by Parnas Seoul Insadong': ('Nine Tree by Parnas 仁寺洞', '鐘路・仁寺洞', True),
 }
+ALIAS = {'ibis Ambassador Seoul Insadong': '宜必思', 'Insadong N285 Hotel': 'N285', 'Nine Tree by Parnas Seoul Insadong': 'Nine Tree', 'Ikseon Atelier': 'Ikseon'}
+def matches(q, name):
+    if q in ALIAS: return ALIAS[q].lower() in name.lower()
+    return all(w.lower() in name.lower() for w in q.split() if len(w) > 3 and w != 'Seoul')
 PRICE = re.compile(r'^(US\$|NT\$|\$)([\d,]+)$')
 
 def first_card(path):
@@ -51,6 +55,7 @@ def main():
             head, c = first_card(f)
             if f'{int(n[5:7])}月{int(n[8:])}日' not in head: problems.append(f'{disp} {nl(n)} 日期未套用'); continue
             if not c: problems.append(f'{disp} {nl(n)} 無結果'); continue
+            if not matches(q, c['name']): problems.append(f"{disp} {nl(n)} 搜尋結果是別間（{c['name']}）"); continue
             card0 = card0 or c
             prices[n] = c['price']
         avail = [p for p in prices.values() if p]
@@ -59,7 +64,7 @@ def main():
     # 驗證第一張卡片就是該飯店（名稱有共同字詞）
     for r in rows:
         c = r['card']
-        r['match'] = bool(c) and any(w.lower() in c['name'].lower() for w in r['q'].split() if len(w) > 3)
+        r['match'] = bool(c)
     rows.sort(key=lambda r: (not r['in_jongno'], r['avg'] is None, r['avg'] or 0))
     with open(os.path.join(HERE, 'jongno_hotels.csv'), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
@@ -76,3 +81,43 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# 推薦表：各機票日期組的每晚平均（只算有價格的晚數齊全時）
+STAYS = [('1/2-1/4（2晚）', NIGHTS[2:]), ('1/1-1/4（3晚）', NIGHTS[1:]), ('12/31-1/4（4晚）', NIGHTS)]
+def render():
+    import io, contextlib
+    with contextlib.redirect_stdout(io.StringIO()): pass
+    rows = []
+    for q, (disp, loc, inj) in HOTELS.items():
+        prices, card = {}, None
+        for n in NIGHTS:
+            f = os.path.join(HERE, 'raw_jongno', f"{q.replace(' ', '_')}-{n}.txt")
+            if not os.path.exists(f): continue
+            head, c = first_card(f)
+            if c and matches(q, c['name']) and f'{int(n[5:7])}月{int(n[8:])}日' in head:
+                prices[n] = c['price']; card = card or c
+        if not card: continue
+        avgs = [round(sum(prices[n] for n in ns) / len(ns)) if all(prices.get(n) for n in ns) else None for _, ns in STAYS]
+        rows.append((disp, loc, inj, card, prices, avgs))
+    rows.sort(key=lambda r: (not r[2], r[5][0] or 99999))
+    def td(v, budget=False):
+        if v is None: return "<td class='num na'>滿房/無價</td>"
+        return f"<td class='num{' ok' if budget and v <= BUDGET else (' over' if budget else '')}'>{v:,}</td>"
+    trs = ''.join(
+        f"<tr class='{'' if inj else 'near'}'><td><b>{d}</b><br><span class='s'>{l}</span></td><td>{c.get('stars') or '—'}</td><td>{c.get('rating')}（{c.get('reviews')}）</td>"
+        + ''.join(td(p.get(n)) for n in NIGHTS) + ''.join(td(a, True) for a in av) + '</tr>'
+        for d, l, inj, c, p, av in rows)
+    html = f"""<!doctype html><html><head><meta charset='utf-8'><style>
+body{{font-family:'WenQuanYi Zen Hei',sans-serif;margin:16px;background:#fff;color:#222;font-size:13px}}
+h1{{font-size:20px;margin:0 0 4px}} .sub,.s{{color:#555}} .s{{font-size:11px}}
+table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px}} th{{background:#333;color:#fff;font-weight:normal}}
+.num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}} tr.near td:first-child{{background:#f2f2f2}}
+.foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1100px}}</style></head><body>
+<h1>鐘路推薦飯店（每晚預算 NT${BUDGET:,}）</h1><div class='sub'>Google 飯店單晚查詢，每晚最低價；綠＝平均 ≤ {BUDGET:,}，紅＝超出。灰底＝在中區、鄰近鐘路。</div>
+<table><tr><th>飯店</th><th>星級</th><th>評分（評論數）</th>{''.join(f'<th>{nl(n)}</th>' for n in NIGHTS)}{''.join(f'<th>平均 {s}</th>' for s, _ in STAYS)}</tr>{trs}</table>
+<div class='foot'>匯率 1 USD = {TWD_PER_USD} TWD。2026-10-24 抓取；房價為 Google 顯示的最低價，含稅與否依通路而定，以訂房頁為準。益善 Atelier 搜不到正確結果，已排除。</div></body></html>"""
+    open(os.path.join(HERE, 'jongno_hotels.html'), 'w').write(html)
+    for d, l, inj, c, p, av in rows: print(d, inj, av)
+
+if __name__ == '__main__':
+    render()
