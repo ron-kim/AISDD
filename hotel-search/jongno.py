@@ -26,6 +26,12 @@ ALIAS = {'ibis Ambassador Seoul Insadong': '宜必思', 'Insadong N285 Hotel': '
 def matches(q, name):
     if q in ALIAS: return ALIAS[q].lower() in name.lower()
     return all(w.lower() in name.lower() for w in q.split() if len(w) > 3 and w != 'Seoul')
+# 性別限定房型（訂房網站房型資料，2026-10-24 查）
+FEMALE_ONLY = {'takt jongno'}  # 全館女性專用膠囊旅館 → 排除
+GENDER_NOTE = {
+    'Hanok Hotel DAAM': '全為男女分開的共用房；Google 最低價可能是女性房，男性房價格未確認',
+    'Mangrove Dongdaemun': '有女性／男性 6 人宿舍與私人房；最低價可能是宿舍床位，未確認',
+}
 PRICE = re.compile(r'^(US\$|NT\$|\$)([\d,]+)$')
 
 def first_card(path):
@@ -89,6 +95,7 @@ def render():
     with contextlib.redirect_stdout(io.StringIO()): pass
     rows = []
     for q, (disp, loc, inj) in HOTELS.items():
+        if q in FEMALE_ONLY: continue
         prices, card = {}, None
         for n in NIGHTS:
             f = os.path.join(HERE, 'raw_jongno', f"{q.replace(' ', '_')}-{n}.txt")
@@ -98,7 +105,7 @@ def render():
                 prices[n] = c['price']; card = card or c
         if not card: continue
         avgs = [round(sum(prices[n] for n in ns) / len(ns)) if all(prices.get(n) for n in ns) else None for _, ns in STAYS]
-        rows.append((disp, loc, inj, card, prices, avgs))
+        rows.append((disp, loc + ('' if q not in GENDER_NOTE else f"<br><span class='warn'>⚠ {GENDER_NOTE[q]}</span>"), inj, card, prices, avgs))
     rows.sort(key=lambda r: (not r[2], r[5][0] or 99999))
     def td(v, budget=False):
         if v is None: return "<td class='num na'>滿房/無價</td>"
@@ -112,8 +119,8 @@ body{{font-family:'WenQuanYi Zen Hei',sans-serif;margin:16px;background:#fff;col
 h1{{font-size:20px;margin:0 0 4px}} .sub,.s{{color:#555}} .s{{font-size:11px}}
 table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px}} th{{background:#333;color:#fff;font-weight:normal}}
 .num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}} tr.near td:first-child{{background:#f2f2f2}}
-.foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1100px}}</style></head><body>
-<h1>鐘路推薦飯店（每晚預算 NT${BUDGET:,}）</h1><div class='sub'>Google 飯店單晚查詢，每晚最低價；綠＝平均 ≤ {BUDGET:,}，紅＝超出。灰底＝在中區、鄰近鐘路。</div>
+.warn{{color:#b45309}} .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1100px}}</style></head><body>
+<h1>鐘路推薦飯店（每晚預算 NT${BUDGET:,}）</h1><div class='sub'>Google 飯店單晚查詢，每晚最低價；綠＝平均 ≤ {BUDGET:,}，紅＝超出。灰底＝在中區、鄰近鐘路。已排除限女性住宿（takt jongno 為女性專用膠囊旅館）；⚠＝有性別限定房型，最低價可能是女性房。</div>
 <table><tr><th>飯店</th><th>星級</th><th>評分（評論數）</th>{''.join(f'<th>{nl(n)}</th>' for n in NIGHTS)}{''.join(f'<th>平均 {s}</th>' for s, _ in STAYS)}</tr>{trs}</table>
 <div class='foot'>匯率 1 USD = {TWD_PER_USD} TWD。2026-10-24 抓取；房價為 Google 顯示的最低價，含稅與否依通路而定，以訂房頁為準。益善 Atelier 搜不到正確結果，已排除。</div></body></html>"""
     open(os.path.join(HERE, 'jongno_hotels.html'), 'w').write(html)
