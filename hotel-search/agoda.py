@@ -25,6 +25,9 @@ HOTELS = {  # key → (顯示名, 區域, 位置)
     'kingstown': ('Skypark Kingstown 東大門', '東大門', '東大門歷史文化公園站'),
     'westerncoop': ('西方 Co-op 東大門飯店公寓', '東大門', '東大門'),
     'ramada': ('華美達首爾東大門', '東大門', '東大門'),
+    'glue': ('glue hotel', '東大門', '東大門'),
+    'migliore': ('Hotel Migliore 首爾', '東大門', '東大門'),
+    'aboutstay': ('ABOUTSTAY 東大門', '東大門', '東大門'),
 }
 EXCLUDE_ROOM = re.compile(r'宿舍|床位|膠囊|Dorm|Capsule|女性|Female|Women|共用|Shared', re.I)
 SIZE = re.compile(r'平方公尺|最多可住')
@@ -59,7 +62,9 @@ def main():
     data, problems, raw_rows, meta = {}, [], [], {}
     for k, (disp, area, loc) in HOTELS.items():
         ratio = tax_ratio(k)
-        if ratio is None: problems.append(f'{disp} 稅率未取得（以 1.10 估）')
+        sold_out_all = all('已完售' in load(p)['head'] and not load(p)['grid']
+                           for p in [os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json') for n in NIGHTS] if os.path.exists(p))
+        if ratio is None and not sold_out_all: problems.append(f'{disp} 稅率未取得（以 1.10 估）')
         meta[k] = dict(ratio=ratio or 1.10, ratio_ok=ratio is not None)
         for n in NIGHTS:
             f = os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json')
@@ -70,6 +75,7 @@ def main():
             if m and 'rating' not in meta[k]:
                 meta[k].update(rating=float(m.group(1)), reviews=int(m.group(2).replace(',', '')))
             rooms = parse_grid(d['grid'])
+            if not rooms and '已完售' in d['head']: data[(k, n)] = None; continue  # Agoda 整間已完售
             if not rooms: problems.append(f'{disp} {nl(n)} 無房型資料'); continue
             ok = [r for r in rooms if r['prices'] and not r['sold_out'] and not EXCLUDE_ROOM.search(r['name'])]
             best = min(ok, key=lambda r: min(r['prices'])) if ok else None
