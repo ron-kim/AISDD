@@ -5,6 +5,8 @@ import csv, glob, json, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 TWD_PER_USD = 32.59  # open.er-api.com 2026-10-23
 BUDGET = 3000
+MIN_REVIEWS = 100  # 評論數低於此值的飯店排除
+def nrev(c): return float(((c or {}).get('reviews') or '0').replace(',', ''))
 NIGHTS = ['2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03']
 def nl(d): return f"{int(d[5:7])}/{int(d[8:])}"
 # 查詢名稱 → (顯示名, 位置／最近站, 是否在鐘路區)
@@ -72,6 +74,7 @@ def main():
     for r in rows:
         c = r['card']
         r['match'] = bool(c)
+    rows = [r for r in rows if nrev(r['card']) >= MIN_REVIEWS]
     rows.sort(key=lambda r: (not r['in_jongno'], r['avg'] is None, r['avg'] or 0))
     with open(os.path.join(HERE, 'jongno_hotels.csv'), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
@@ -104,7 +107,7 @@ def render():
             head, c = first_card(f)
             if c and matches(q, c['name']) and f'{int(n[5:7])}月{int(n[8:])}日' in head:
                 prices[n] = c['price']; card = card or c
-        if not card: continue
+        if not card or nrev(card) < MIN_REVIEWS: continue
         avgs = [round(sum(prices[n] for n in ns) / len(ns)) if all(prices.get(n) for n in ns) else None for _, ns in STAYS]
         rows.append((disp, loc + ('' if q not in GENDER_NOTE else f"<br><span class='warn'>⚠ {GENDER_NOTE[q]}</span>"), inj, card, prices, avgs))
     rows.sort(key=lambda r: (not r[2], r[5][0] or 99999))
@@ -121,7 +124,7 @@ h1{{font-size:20px;margin:0 0 4px}} .sub,.s{{color:#555}} .s{{font-size:11px}}
 table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px}} th{{background:#333;color:#fff;font-weight:normal}}
 .num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}} tr.near td:first-child{{background:#f2f2f2}}
 .warn{{color:#b45309}} .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1100px}}</style></head><body>
-<h1>鐘路推薦飯店（每晚預算 NT${BUDGET:,}）</h1><div class='sub'>Google 飯店單晚查詢，每晚最低價；綠＝平均 ≤ {BUDGET:,}，紅＝超出。灰底＝在中區、鄰近鐘路。已排除限女性住宿（takt jongno 為女性專用膠囊旅館）；⚠＝有性別限定房型，最低價可能是女性房。</div>
+<h1>鐘路推薦飯店（每晚預算 NT${BUDGET:,}）</h1><div class='sub'>Google 飯店單晚查詢，每晚最低價；綠＝平均 ≤ {BUDGET:,}，紅＝超出。灰底＝在中區、鄰近鐘路。已排除限女性住宿（takt jongno 為女性專用膠囊旅館）；⚠＝有性別限定房型，最低價可能是女性房。已排除評論數少於 {MIN_REVIEWS} 則的住宿（VIA Jongno 3 則）。</div>
 <table><tr><th>飯店</th><th>星級</th><th>評分（評論數）</th>{''.join(f'<th>{nl(n)}</th>' for n in NIGHTS)}{''.join(f'<th>平均 {s}</th>' for s, _ in STAYS)}</tr>{trs}</table>
 <div class='foot'>匯率 1 USD = {TWD_PER_USD} TWD。2026-10-24 抓取；房價為 Google 顯示的最低價，含稅與否依通路而定，以訂房頁為準。益善 Atelier 搜不到正確結果，已排除。</div></body></html>"""
     open(os.path.join(HERE, 'jongno_hotels.html'), 'w').write(html)
