@@ -36,6 +36,7 @@ COMBO_COLOR = ['#fde2e4', '#fff1c1', '#e2f0cb', '#d7e3fc', '#f1d4f7', '#ffd6a5',
 def combo_label(c): return f"{int(c[0][5:7])}/{int(c[0][8:])}-{int(c[1][5:7])}/{int(c[1][8:])}"
 
 MIN_STAY = 24
+FETCHED = '2026-10-24'  # 本版抓取日
 PAGE = 150  # 早去晚回排行每張 PNG 的列數
 EARLY_OUT = time(9, 30)
 LATE_RET = time(18, 0)
@@ -63,17 +64,27 @@ def parse(label):
     return dict(price=int(g[0]), airline=g[1], dep=dep, arr=arr,
                 frm=AIRPORT.get(g[7], g[7]), to=AIRPORT.get(g[13], g[13]))
 
+PREV = os.path.join(HERE, 'v1')  # 前一版資料：本版沒抓到的查詢沿用它，並用它的 CSV 比較漲跌
+STALE_OW, STALE_RT = [], []  # 沿用前版的查詢名稱
+
+def read_labels(f):
+    try: return json.loads(json.loads(open(f).read())) or []
+    except Exception: return []
+
 def load_oneway():
     flights, seen = [], set()
-    for f in sorted(glob.glob(os.path.join(HERE, 'raw', '*.json'))):
-        try: labels = json.loads(json.loads(open(f).read()))
-        except Exception: continue
+    names = sorted({os.path.basename(f) for d in (os.path.join(HERE, 'raw'), os.path.join(PREV, 'raw')) for f in glob.glob(os.path.join(d, '*.json'))})
+    for name in names:
+        labels, stale = read_labels(os.path.join(HERE, 'raw', name)), False
+        if not labels and read_labels(os.path.join(PREV, 'raw', name)):
+            labels, stale = read_labels(os.path.join(PREV, 'raw', name)), True
+            STALE_OW.append(name[:-5])
         for s in labels:
             x = parse(s)
             if not x: continue
             k = (x['frm'], x['to'], x['dep'], x['airline'], x['price'])
             if k in seen: continue
-            seen.add(k); flights.append(x)
+            seen.add(k); x['stale'] = stale; flights.append(x)
     return flights
 
 def eff_return_date(dep):
@@ -119,6 +130,7 @@ def make_row(combo, ob, rb, out_price, ret_price, rt_price=None):
     notes = [n for n in (n1 and '去程' + n1, n2 and '回程' + n2) if n]
     if rb['dep'].time() < time(5): notes.append('回程深夜班(算前一晚)')
     if ob['to'] != rb['frm']: notes.append(f"{ob['to']}進{rb['frm']}出")
+    if ob.get('stale') or rb.get('stale'): notes.append('沿用前版票價')
     bag_note = sorted({s for s in (so, sr) if s.startswith('未確認')})
     notes += ['行李' + s for s in bag_note]
     return dict(combo=combo, total=fare + bo + br + tr, out_price=out_price, ret_price=ret_price, rt=rt_price,
@@ -140,9 +152,21 @@ def build_oneway_rows(flights):
                 rows.append(make_row(c, ob, rb, ob['price'], rb['price']))
     return rows
 
+def rt_complete(f):
+    try: d = json.load(open(f))
+    except Exception: return False
+    picks = [json.loads(v) if isinstance(v, str) else v for v in (d.get('picks') or {}).values()]
+    return bool(picks) and all(picks)
+
 def build_rt_rows():
     rows, seen = [], set()
-    for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json')) + glob.glob(os.path.join(HERE, 'raw_rt', '*.json.prev'))):
+    files = [(f, False) for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json')) + glob.glob(os.path.join(HERE, 'raw_rt', '*.json.prev')))]
+    for f in sorted(glob.glob(os.path.join(PREV, 'raw_rt', '*.json')) + glob.glob(os.path.join(PREV, 'raw_rt', '*.json.prev'))):
+        name = os.path.basename(f).replace('.prev', '')
+        if not rt_complete(os.path.join(HERE, 'raw_rt', name)):  # 本版沒抓完整 → 沿用前版
+            files.append((f, True))
+            if name[:-5] not in STALE_RT: STALE_RT.append(name[:-5])
+    for f, stale in files:
         try: data = json.load(open(f))
         except Exception: continue
         dec = lambda v: json.loads(v) if isinstance(v, str) else (v or [])  # eval 結果是 JSON 字串
@@ -161,6 +185,7 @@ def build_rt_rows():
                 k = (c, ob['dep'], ob['airline'], rb['dep'], rb['airline'])
                 if k in seen: continue
                 seen.add(k)
+                ob['stale'] = rb['stale'] = stale
                 rows.append(make_row(c, ob, rb, None, None, rt_price=rb['price']))
     return rows
 
@@ -209,23 +234,38 @@ tr.top td{{background:#c8f0c8}} tr.rt td{{background:#cfe3ff}} .chip{{padding:1p
 <h1>{title}</h1><div class='sub'>{subtitle}</div><div class='sub'>日期組：{legend}　<span class='chip' style='background:#c8f0c8'>前3名</span><span class='chip' style='background:#cfe3ff'>來回票</span></div>
 <table><tr>{head}</tr>{trs(rows, start=start)}</table>{extra}
 <div class='foot'>總價＝去程＋回程＋行李(每段1件)＋機場⇄首爾站來回交通，單位 NT$，匯率 1 TWD = {KRW_PER_TWD} KRW。行李後加 * 表示含未確認／估算值。<br>交通：{tr_note}<br>
-到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（2026-10-23 抓取，單程與來回）。TSA 只有飛 GMP 的直飛；CJJ 查無台北直飛。<br>來回票未抓完整（無前一版可沿用）：{'、'.join(missing_rt()) or '無'}</div>
+到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（{FETCHED} 抓取，單程與來回；備註「前版」為 2026-10-23 第 1 版總價）。TSA 只有飛 GMP 的直飛；CJJ 查無台北直飛。<br>
+沿用前版（本版沒抓到）：單程 {'、'.join(STALE_OW) or '無'}；來回 {'、'.join(STALE_RT) or '無'}</div>
 </body></html>"""
+
+def row_key(combo_lbl, out, ret, is_rt): return (combo_lbl, out, ret, bool(is_rt))
+
+def load_prev():
+    f = os.path.join(PREV, 'flights_ranking.csv')
+    if not os.path.exists(f): return {}
+    return {row_key(r['日期組'], r['去程'], r['回程'], r['來回票'] == 'Y'): (int(r['總價']), int(r['名次']))
+            for r in csv.DictReader(open(f, encoding='utf-8-sig'))}
 
 def main():
     flights = load_oneway()
     rows = [r for r in build_oneway_rows(flights) + build_rt_rows() if r['stay'] >= MIN_STAY]
     rows.sort(key=lambda r: (r['total'], r['stay'] * -1))
+    prev = load_prev()
+    for r in rows:
+        p = prev.get(row_key(combo_label(r['combo']), r['out'], r['ret'], r['rt'] is not None))
+        r['prev'] = p[0] if p else None
+        if prev:
+            r['note'] = '；'.join(x for x in (r['note'], f"前版 {p[0]:,}（{r['total'] - p[0]:+,}）" if p and p[0] != r['total'] else ('前版同價' if p else '新出現')) if x)
     early = [r for r in rows if r['early_late']]
     top60 = rows[:60]
     rts = [r for r in rows if r['rt'] is not None]
     with open(os.path.join(HERE, 'flights_ranking.csv'), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
-        w.writerow(['名次', '日期組', '總價', '去程票價', '回程票價', '行李', '行李未確認', '交通', '去程', '到達市區', '回程', '離開市區', '停留時數', '早去晚回', '來回票', '備註'])
+        w.writerow(['名次', '日期組', '總價', '去程票價', '回程票價', '行李', '行李未確認', '交通', '去程', '到達市區', '回程', '離開市區', '停留時數', '早去晚回', '來回票', '前版總價', '備註'])
         for i, r in enumerate(rows, 1):
             w.writerow([i, combo_label(r['combo']), r['total'], price_cell(r, 'out_price'), price_cell(r, 'ret_price'), r['bag'],
                         'Y' if r['bag_unconfirmed'] else '', r['transport'], r['out'], r['arrive'], r['ret'], r['leave'], r['stay'],
-                        'Y' if r['early_late'] else '', 'Y' if r['rt'] is not None else '', r['note']])
+                        'Y' if r['early_late'] else '', 'Y' if r['rt'] is not None else '', r['prev'] or '', r['note']])
     sub = '1 成人經濟艙・只看直飛・TPE/TSA ⇄ ICN/GMP/CJJ/TAE/PUS・12/31–1/4 涵蓋 1/2 或 1/3・停留 ≥ 24 小時'
     title = f'早去晚回排行（去程 ≤09:30、回程 ≥18:00，共 {len(early)} 案）'
     open(os.path.join(HERE, 'rank_early_late.html'), 'w').write(html_table(title, sub, early))
