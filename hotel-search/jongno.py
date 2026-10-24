@@ -54,6 +54,7 @@ def first_card(path):
 def main():
     rows, problems = [], []
     for q, (disp, loc, in_jongno) in HOTELS.items():
+        if q in FEMALE_ONLY: continue
         prices, card0 = {}, None
         for n in NIGHTS:
             f = os.path.join(HERE, 'raw_jongno', f"{q.replace(' ', '_')}-{n}.txt")
@@ -74,10 +75,10 @@ def main():
     rows.sort(key=lambda r: (not r['in_jongno'], r['avg'] is None, r['avg'] or 0))
     with open(os.path.join(HERE, 'jongno_hotels.csv'), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
-        w.writerow(['飯店', 'Google名稱', '位置', '在鐘路區', '星級', '評分', '評論數'] + [f'{nl(n)} NT$' for n in NIGHTS] + ['4晚平均', '≤3000'])
+        w.writerow(['飯店', 'Google名稱', '位置', '性別限定註記', '在鐘路區', '星級', '評分', '評論數'] + [f'{nl(n)} NT$' for n in NIGHTS] + ['4晚平均', '≤3000'])
         for r in rows:
             c = r['card'] or {}
-            w.writerow([r['disp'], c.get('name', ''), r['loc'], 'Y' if r['in_jongno'] else '', c.get('stars') or '', c.get('rating') or '', c.get('reviews') or '']
+            w.writerow([r['disp'], c.get('name', ''), r['loc'], GENDER_NOTE.get(r['q'], ''), 'Y' if r['in_jongno'] else '', c.get('stars') or '', c.get('rating') or '', c.get('reviews') or '']
                        + [r['prices'].get(n) or '滿房/無價' for n in NIGHTS] + [r['avg'] or '', 'Y' if r['avg'] and r['avg'] <= BUDGET else ''])
     for r in rows:
         c = r['card'] or {}
