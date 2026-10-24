@@ -1,27 +1,40 @@
 #!/usr/bin/env python3
-"""Agoda 房型確認：解析各飯店各晚的房型區塊，取每晚最便宜的「可訂、非青旅／膠囊、非限女性」房型，輸出 CSV 與推薦表。"""
-import csv, glob, json, os, re
+"""Agoda 房型確認（鐘路＋東大門）：每晚取最便宜的「可訂、非青旅／膠囊／宿舍、非限女性」房型，
+依各飯店結帳頁實際稅率換算含稅價，輸出 CSV 與推薦表。"""
+import csv, json, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BUDGET = 3000
+BUDGET = 3000  # 含稅每晚平均
+MIN_REVIEWS = 100  # Agoda 評鑑數
 NIGHTS = ['2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03']
 def nl(d): return f"{int(d[5:7])}/{int(d[8:])}"
 def zh_date(d): return f"{int(d[:4])}年{int(d[5:7])}月{int(d[8:])}日"
 STAYS = [('1/2-1/4（2晚）', NIGHTS[2:]), ('1/1-1/4（3晚）', NIGHTS[1:]), ('12/31-1/4（4晚）', NIGHTS)]
-HOTELS = {  # key → (顯示名, 位置, Google 評論數)
-    'yaja': ('Hotel Yaja Jongno', '鐘路・鐘路3街站', 140),
-    'simplestay': ('SimpleStay Hotel（鐘路簡單住宿）', '鐘路・鐘路3街站 300m', 226),
-    'ibis': ('宜必思大使仁寺洞', '鐘路・仁寺洞', 2900),
-    'n285': ('仁寺洞 N285 酒店', '鐘路・仁寺洞', 198),
-    'travelodge': ('Travelodge 東大門', '中區・乙支路4街站（鄰近鐘路）', 1700),
-    'amid': ('AMID Hotel Seoul', '鐘路・仁寺洞5街', 1600),
-    'ninetree': ('Nine Tree by Parnas 仁寺洞', '鐘路・仁寺洞', 1500),
+HOTELS = {  # key → (顯示名, 區域, 位置)
+    'yaja': ('Hotel Yaja Jongno', '鐘路', '鐘路3街站'),
+    'simplestay': ('SimpleStay Hotel（鐘路簡單住宿）', '鐘路', '鐘路3街站 300m'),
+    'ibis': ('宜必思大使仁寺洞', '鐘路', '仁寺洞'),
+    'n285': ('仁寺洞 N285 酒店', '鐘路', '仁寺洞'),
+    'amid': ('AMID Hotel Seoul', '鐘路', '仁寺洞5街'),
+    'ninetree': ('Nine Tree by Parnas 仁寺洞', '鐘路', '仁寺洞'),
+    'travelodge': ('Travelodge 東大門', '東大門', '乙支路4街站'),
+    'toyoko1': ('東橫INN 首爾東大門1號店', '東大門', '東大門歷史文化公園站'),
+    'toyoko2': ('東橫INN 首爾東大門2號店', '東大門', '東大門歷史文化公園站'),
+    'ibisbudget': ('宜必思快捷大使東大門', '東大門', '東大門歷史文化公園站 160m'),
+    'skypark1': ('Skypark 東大門1', '東大門', '東大門'),
+    'kingstown': ('Skypark Kingstown 東大門', '東大門', '東大門歷史文化公園站'),
+    'westerncoop': ('西方 Co-op 東大門飯店公寓', '東大門', '東大門'),
+    'ramada': ('華美達首爾東大門', '東大門', '東大門'),
 }
 EXCLUDE_ROOM = re.compile(r'宿舍|床位|膠囊|Dorm|Capsule|女性|Female|Women|共用|Shared', re.I)
 SIZE = re.compile(r'平方公尺|最多可住')
 
+def load(path):
+    v = json.loads(open(path).read())
+    return json.loads(v) if isinstance(v, str) else v  # agent-browser eval 回傳 JSON 字串
+
 def parse_grid(grid):
-    """回傳 [{name, prices[], sold_out}]，name 為房型名稱（下一行是坪數／床型）。"""
+    """回傳 [{name, info, prices[], sold_out}]；房型名稱的下一行是坪數／入住人數。"""
     lines = [l.strip() for l in grid.split('\n') if l.strip()]
     rooms, cur = [], None
     for i, l in enumerate(lines):
@@ -33,59 +46,83 @@ def parse_grid(grid):
             cur['prices'].append(int(lines[i + 1].replace(',', '')))
     return rooms
 
+def tax_ratio(k):
+    """結帳頁「含稅總價」÷ 房型區塊第一個（不含稅）價格。"""
+    f = os.path.join(HERE, 'raw_agoda', f'tax-{k}.json')
+    if not os.path.exists(f): return None
+    d = load(f)
+    m = re.search(r'含稅總價\s*\n?\s*NT\$\s*([\d,.]+)', d.get('body', ''))
+    first = float(str(d.get('first', '')).replace(',', '') or 0)
+    return round(float(m.group(1).replace(',', '')) / first, 4) if m and first else None
+
 def main():
-    data, problems, raw_rows = {}, [], []
-    for k in HOTELS:
+    data, problems, raw_rows, meta = {}, [], [], {}
+    for k, (disp, area, loc) in HOTELS.items():
+        ratio = tax_ratio(k)
+        if ratio is None: problems.append(f'{disp} 稅率未取得（以 1.10 估）')
+        meta[k] = dict(ratio=ratio or 1.10, ratio_ok=ratio is not None)
         for n in NIGHTS:
             f = os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json')
-            if not os.path.exists(f): problems.append(f'{HOTELS[k][0]} {nl(n)} 未抓'); continue
-            try: d = json.loads(json.loads(open(f).read()))
-            except Exception: problems.append(f'{HOTELS[k][0]} {nl(n)} 讀取失敗'); continue
-            if zh_date(n) not in d['head']: problems.append(f'{HOTELS[k][0]} {nl(n)} 日期未套用'); continue
+            if not os.path.exists(f): problems.append(f'{disp} {nl(n)} 未抓'); continue
+            d = load(f)
+            if zh_date(n) not in d['head']: problems.append(f'{disp} {nl(n)} 日期未套用'); continue
+            m = re.search(r'\n(\d\.\d)\n+[^\n]+\n+([\d,]+) 篇評鑑', d['head'])
+            if m and 'rating' not in meta[k]:
+                meta[k].update(rating=float(m.group(1)), reviews=int(m.group(2).replace(',', '')))
             rooms = parse_grid(d['grid'])
-            if not rooms: problems.append(f'{HOTELS[k][0]} {nl(n)} 無房型資料'); continue
+            if not rooms: problems.append(f'{disp} {nl(n)} 無房型資料'); continue
             ok = [r for r in rooms if r['prices'] and not r['sold_out'] and not EXCLUDE_ROOM.search(r['name'])]
             best = min(ok, key=lambda r: min(r['prices'])) if ok else None
-            data[(k, n)] = dict(best=best, n_rooms=len(rooms), n_avail=len([r for r in rooms if r['prices'] and not r['sold_out']]),
-                                excluded=[r['name'] for r in rooms if EXCLUDE_ROOM.search(r['name'])])
+            data[(k, n)] = best
             for r in rooms:
-                raw_rows.append([HOTELS[k][0], nl(n), r['name'], r['info'], '已完售' if r['sold_out'] or not r['prices'] else min(r['prices']),
-                                 '排除' if EXCLUDE_ROOM.search(r['name']) else ''])
+                p = None if r['sold_out'] or not r['prices'] else min(r['prices'])
+                raw_rows.append([disp, area, nl(n), r['name'], r['info'], p or '已完售',
+                                 round(p * meta[k]['ratio']) if p else '', '排除' if EXCLUDE_ROOM.search(r['name']) else ''])
     with open(os.path.join(HERE, 'agoda_rooms.csv'), 'w', newline='', encoding='utf-8-sig') as f:
-        w = csv.writer(f); w.writerow(['飯店', '入住晚', '房型', '坪數／床型', '最低價 NT$（不含稅）', '備註']); w.writerows(raw_rows)
+        w = csv.writer(f)
+        w.writerow(['飯店', '區域', '入住晚', '房型', '坪數／人數', '最低價 NT$（不含稅）', '含稅 NT$', '備註']); w.writerows(raw_rows)
 
-    rows = []
-    for k, (disp, loc, rev) in HOTELS.items():
-        p = {n: (data.get((k, n)) or {}).get('best') for n in NIGHTS}
-        price = {n: min(b['prices']) if b else None for n, b in p.items()}
+    rows, low_rev = [], []
+    for k, (disp, area, loc) in HOTELS.items():
+        mt = meta[k]
+        if mt.get('reviews', 0) < MIN_REVIEWS: low_rev.append(disp); continue
+        best = {n: data.get((k, n)) for n in NIGHTS}
+        price = {n: round(min(b['prices']) * mt['ratio']) if b else None for n, b in best.items()}
         avgs = [round(sum(price[n] for n in ns) / len(ns)) if all(price[n] for n in ns) else None for _, ns in STAYS]
-        rows.append((k, disp, loc, rev, p, price, avgs))
-    rows.sort(key=lambda r: (r[6][0] is None, r[6][0] or 0))
+        rows.append((k, disp, area, loc, mt, best, price, avgs))
+    rows.sort(key=lambda r: (r[7][0] is None, r[7][0] or 0))
+
+    with open(os.path.join(HERE, 'agoda_summary.csv'), 'w', newline='', encoding='utf-8-sig') as f:
+        w = csv.writer(f)
+        w.writerow(['飯店', '區域', '位置', 'Agoda評分', '評鑑數', '稅率'] + [f'{nl(n)} 含稅' for n in NIGHTS] + [f'平均 {s}' for s, _ in STAYS])
+        for k, disp, area, loc, mt, best, price, avgs in rows:
+            w.writerow([disp, area, loc, mt.get('rating', ''), mt.get('reviews', ''), mt['ratio']] + [price[n] or '無空房' for n in NIGHTS] + [a or '' for a in avgs])
 
     def td(v, budget=False):
         if v is None: return "<td class='num na'>無空房</td>"
         return f"<td class='num{' ok' if budget and v <= BUDGET else (' over' if budget else '')}'>{v:,}</td>"
     def room_cell(b): return f"<span class='s'>{b['name']}</span>" if b else ''
     trs = ''.join(
-        f"<tr><td><b>{disp}</b><br><span class='s'>{loc}・Google 評論 {rev:,}</span></td>"
-        + ''.join(f"<td class='num'>{'—' if price[n] is None else f'{price[n]:,}'}<br>{room_cell(p[n])}</td>" for n in NIGHTS)
+        f"<tr class='{'dd' if area == '東大門' else ''}'><td><b>{disp}</b><br><span class='s'>{area}・{loc}・Agoda {mt.get('rating', '?')}（{mt.get('reviews', 0):,} 篇）"
+        f"・稅率 {'%.0f' % ((mt['ratio'] - 1) * 100)}%{'' if mt['ratio_ok'] else '(估)'}</span></td>"
+        + ''.join(f"<td class='num'>{'—' if price[n] is None else f'{price[n]:,}'}<br>{room_cell(best[n])}</td>" for n in NIGHTS)
         + ''.join(td(a, True) for a in avgs) + '</tr>'
-        for k, disp, loc, rev, p, price, avgs in rows)
+        for k, disp, area, loc, mt, best, price, avgs in rows)
     html = f"""<!doctype html><html><head><meta charset='utf-8'><style>
 body{{font-family:'WenQuanYi Zen Hei',sans-serif;margin:16px;background:#fff;color:#222;font-size:13px}}
 h1{{font-size:20px;margin:0 0 4px}} .sub,.s{{color:#555}} .s{{font-size:11px}}
 table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px;vertical-align:top}} th{{background:#333;color:#fff;font-weight:normal}}
-.num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}}
-.foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1200px}}</style></head><body>
-<h1>鐘路飯店 Agoda 房型確認（每晚預算 NT${BUDGET:,}）</h1>
-<div class='sub'>Agoda 1 位大人・1 間房，每晚最便宜的可訂房型（已排除青旅、膠囊、宿舍床位、限女性與共用房）；價格為 Agoda 顯示的每晚房價，不含稅。綠＝平均 ≤ {BUDGET:,}。</div>
+.num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}} tr.dd td:first-child{{background:#eef4ff}}
+.foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1250px}}</style></head><body>
+<h1>鐘路＋東大門飯店 Agoda 含稅房價（每晚預算 NT${BUDGET:,}）</h1>
+<div class='sub'>Agoda 1 位大人・1 間房，每晚最便宜的可訂房型（已排除青旅、膠囊、宿舍、限女性與共用房）；<b>含稅價</b>＝不含稅價 × 該飯店結帳頁實際稅率。綠＝平均 ≤ {BUDGET:,}；藍底＝東大門。依 2 晚平均排序。</div>
 <table><tr><th>飯店</th>{''.join(f'<th>{nl(n)}</th>' for n in NIGHTS)}{''.join(f'<th>平均 {s}</th>' for s, _ in STAYS)}</tr>{trs}</table>
-<div class='foot'>已排除：韓屋飯店 DAAM（男女分開的共用房）、Mangrove 東大門（青旅宿舍）、takt jongno（女性專用膠囊旅館）、VIA Jongno（評論數過少）。
-2026-10-24 Agoda 抓取；不含稅價，實際結帳另加稅金與服務費，以 Agoda 訂房頁為準。{('未完成：' + '、'.join(problems)) if problems else ''}</div></body></html>"""
+<div class='foot'>已排除：韓屋飯店 DAAM（共用房）、Mangrove 東大門（青旅宿舍）、takt jongno（女性專用膠囊旅館）、VIA Jongno（評論數過少）{('、' + '、'.join(low_rev) + f'（Agoda 評鑑 < {MIN_REVIEWS}）') if low_rev else ''}。
+2026-10-24 Agoda 抓取；最低價多為不可退款方案，可免費取消方案另加價。{('未完成：' + '、'.join(problems)) if problems else ''}</div></body></html>"""
     open(os.path.join(HERE, 'agoda_jongno.html'), 'w').write(html)
-    for k, disp, loc, rev, p, price, avgs in rows:
-        print(disp, {nl(n): (price[n], p[n]['name'] if p[n] else None) for n in NIGHTS}, avgs)
-    print('problems', problems)
+    for k, disp, area, loc, mt, best, price, avgs in rows:
+        print(f"{disp:24} {area} ★{mt.get('rating')}({mt.get('reviews')}) tax={mt['ratio']} {[price[n] for n in NIGHTS]} avg={avgs}")
+    print('low reviews', low_rev); print('problems', problems)
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 # Agoda 飯店頁 × 各晚（1 位大人、1 間房）。存：標題、頁首文字（日期／地址）、房型區塊文字
 export AGENT_BROWSER_EXECUTABLE_PATH=${AGENT_BROWSER_EXECUTABLE_PATH:-/opt/pw-browsers/chromium} AGENT_BROWSER_SESSION=agoda
 OUT="$(dirname "$0")/raw_agoda"
-HOTELS="yaja:hotel-yaja-jongno simplestay:h47228412 ibis:ibis-ambassador-seoul-insadong-hotel n285:n285hotel travelodge:travelodge-dongdaemun-seoul amid:center-mark-hotel ninetree:nine-tree-premier-hotel-insadong"
+HOTELS=${HOTELS:-"yaja:hotel-yaja-jongno simplestay:h47228412 ibis:ibis-ambassador-seoul-insadong-hotel n285:n285hotel travelodge:travelodge-dongdaemun-seoul amid:center-mark-hotel ninetree:nine-tree-premier-hotel-insadong"}
 for d in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do
 for p in $HOTELS; do k=${p%%:*}; slug=${p#*:}
   f="$OUT/$k-$d.json"; [ -s "$f" ] && continue
