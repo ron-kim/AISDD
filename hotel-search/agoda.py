@@ -174,10 +174,10 @@ table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px;v
 .num{{text-align:right}} .ok{{background:#c8f0c8;font-weight:bold}} .over{{background:#ffe0e0}} .na{{color:#999}} tr.dd td:first-child{{background:#eef4ff}}
 .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1250px}}</style></head><body>
 <h1>{gtitle}飯店 Agoda 含稅房價（每晚預算 NT${BUDGET:,}）</h1>
-<div class='sub'>Agoda 1 位大人・1 間房，每晚最便宜的可訂房型（已排除青旅、膠囊、宿舍、限女性與共用房）；<b>含稅價</b>＝不含稅價 × 該飯店結帳頁實際稅率。綠＝平均 ≤ {BUDGET:,}；藍底＝{'東大門' if group == 'jongno' else '弘大'}。依 2 晚平均排序。</div>
+<div class='sub'>Agoda 1 位大人・1 間房，每晚最便宜的可訂房型（已排除青旅、膠囊、宿舍、限女性與共用房）；<b>含稅價</b>＝不含稅價 × 該飯店結帳頁實際稅率。{f'綠＝平均 ≤ {BUDGET:,}；藍底＝' + ('東大門' if group == 'jongno' else '弘大') + '。依 2 晚平均排序。' if stays else f'綠＝每晚 ≤ {BUDGET:,}；依最低一晚排序。INSPIRE Arena 有免費接駁車往返機場（T2 約 15 分、T1 約 25 分，08:30–24:00）。'}</div>
 <table><tr><th>飯店</th>{''.join(f'<th>{nl(n)}</th>' for n in nights)}{''.join(f'<th>平均 {s}</th>' for s, _ in stays)}</tr>{trs}</table>
 <div class='foot'>已排除：{gexcl}{('、' + '、'.join(dorm_only) + '（只有膠囊／宿舍／女性房）') if dorm_only else ''}{('、' + '、'.join(low_rev) + f'（Agoda 評鑑 < {MIN_REVIEWS}）') if low_rev else ''}。
-2026-10-24 Agoda 抓取；最低價多為不可退款方案，可免費取消方案另加價。{('未完成：' + '、'.join(problems)) if problems else ''}</div></body></html>"""
+{'2026-11-02' if group == 'incheon' else '2026-10-24'} Agoda 抓取；最低價多為不可退款方案，可免費取消方案另加價。{('未完成：' + '、'.join(problems)) if problems else ''}</div></body></html>"""
     open(os.path.join(HERE, 'agoda_jongno.html' if group == 'jongno' else f'{prefix}.html'), 'w').write(html)
     for k, disp, area, loc, mt, best, price, avgs in rows:
         print(f"{disp:24} {area} ★{mt.get('rating')}({mt.get('reviews')}) tax={mt['ratio']} {[price[n] for n in nights]} avg={avgs}")
