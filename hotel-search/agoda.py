@@ -28,6 +28,26 @@ HOTELS = {  # key → (顯示名, 區域, 位置)
     'glue': ('glue hotel', '東大門', '東大門'),
     'migliore': ('Hotel Migliore 首爾', '東大門', '東大門'),
     'aboutstay': ('ABOUTSTAY 東大門', '東大門', '東大門'),
+    'airrelax': ('AirRelax 仁川機場飯店', '仁川', '永宗島'),
+    'ora': ('仁川 ORA 飯店', '仁川', '永宗島'),
+    'hu': ('Hotel HU 仁川機場雲西', '仁川', '永宗島'),
+    'parkwood': ('Parkwood 仁川機場飯店', '仁川', '永宗島'),
+    'royalemp': ('Royal Emporium 仁川機場', '仁川', '永宗島'),
+    'days': ('Days Hotel & Suites 仁川機場', '仁川', '永宗島'),
+    'oceanside': ('仁川機場海濱飯店', '仁川', '永宗島'),
+    'lgairtel': ('LG Airtel', '仁川', '永宗島'),
+    'airstay': ('仁川機場 Airstay 飯店', '仁川', '永宗島'),
+    'westerngrace': ('Western Grace 飯店', '仁川', '永宗島'),
+    'oceanview': ('仁川機場海景飯店', '仁川', '永宗島'),
+    'hojo': ('Howard Johnson 仁川機場', '仁川', '永宗島'),
+    'bwpremier': ('Best Western Premier 仁川機場', '仁川', '永宗島'),
+    'theyeongjong': ('The Hotel 永宗 仁川機場', '仁川', '永宗島'),
+    'hotelicn': ('仁川機場飯店', '仁川', '永宗島'),
+    'zeumes': ('仁川機場 Zeumes 飯店', '仁川', '永宗島'),
+    'nest': ('Nest Hotel 仁川', '仁川', '永宗島'),
+    'airportel': ('仁川 Airportel', '仁川', '永宗島'),
+    'icnairtel': ('仁川機場 Airtel', '仁川', '永宗島'),
+    'abest': ('Abest Premium 永宗島', '仁川', '永宗島'),
     'thezip': ('THEZIP 首爾', '新村', '新村／弘大'),
     'urban': ('新村 Urban Hotel & Play', '新村', '新村站'),
     'havenue': ('H Avenue 梨大新村', '新村', '梨大站'),
@@ -45,9 +65,14 @@ HOTELS = {  # key → (顯示名, 區域, 位置)
     'amanti': ('Amanti Hotel 首爾', '弘大', '合井站'),
     'lazycube': ('Lazy Cube 懶方飯店', '弘大', '弘大'),
 }
+GROUP_NIGHTS = {  # 只看部分晚數的組：(入住晚, 多晚平均欄)
+    'incheon': (['2027-01-02', '2027-01-03'], []),
+}
 GROUPS = {  # 輸出組：(標題, 區域, 檔名前綴, 已排除說明)
     'jongno': ('鐘路＋東大門', ('鐘路', '東大門'), 'agoda',
                '韓屋飯店 DAAM（共用房）、Mangrove 東大門（青旅宿舍）、takt jongno（女性專用膠囊旅館）、VIA Jongno（評論數過少）'),
+    'incheon': ('仁川永宗島（演唱會當晚）', ('仁川',), 'agoda_incheon',
+                'Agoda 仁川機場周邊清單中的民宿、青旅、膠囊與機場管制區內轉機飯店'),
     'sinchon': ('新村＋弘大', ('新村', '弘大'), 'agoda_sinchon',
                 'Agoda 新村／弘大清單中的青旅、民宿、膠囊、女性限定與短租公寓；梨大首爾大旅館（4 晚皆已完售）'),
 }
@@ -82,15 +107,16 @@ def tax_ratio(k):
 
 def main(group='jongno'):
     gtitle, gareas, prefix, gexcl = GROUPS[group]
+    nights, stays = GROUP_NIGHTS.get(group, (NIGHTS, STAYS))
     hotels = {k: v for k, v in HOTELS.items() if v[1] in gareas}
     data, problems, raw_rows, meta = {}, [], [], {}
     for k, (disp, area, loc) in hotels.items():
         ratio = tax_ratio(k)
         sold_out_all = all('已完售' in load(p)['head'] and not load(p)['grid']
-                           for p in [os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json') for n in NIGHTS] if os.path.exists(p))
+                           for p in [os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json') for n in nights] if os.path.exists(p))
         if ratio is None and not sold_out_all: problems.append(f'{disp} 稅率未取得（以 1.10 估）')
         meta[k] = dict(ratio=ratio or 1.10, ratio_ok=ratio is not None)
-        for n in NIGHTS:
+        for n in nights:
             f = os.path.join(HERE, 'raw_agoda', f'{k}-{n}.json')
             if not os.path.exists(f): problems.append(f'{disp} {nl(n)} 未抓'); continue
             d = load(f)
@@ -119,17 +145,17 @@ def main(group='jongno'):
         mt = meta[k]
         if mt.get('reviews', 0) < MIN_REVIEWS: low_rev.append(disp); continue
         if mt.get('had_rooms') and not mt.get('has_private'): dorm_only.append(disp); continue  # 只有膠囊／宿舍／限女性房型
-        best = {n: data.get((k, n)) for n in NIGHTS}
+        best = {n: data.get((k, n)) for n in nights}
         price = {n: round(min(b['prices']) * mt['ratio']) if b else None for n, b in best.items()}
-        avgs = [round(sum(price[n] for n in ns) / len(ns)) if all(price[n] for n in ns) else None for _, ns in STAYS]
+        avgs = [round(sum(price[n] for n in ns) / len(ns)) if all(price[n] for n in ns) else None for _, ns in stays]
         rows.append((k, disp, area, loc, mt, best, price, avgs))
-    rows.sort(key=lambda r: (r[7][0] is None, r[7][0] or 0))
+    rows.sort(key=lambda r: (r[7][0] is None, r[7][0] or 0) if stays else (min([p for p in r[6].values() if p] or [99999]),))
 
     with open(os.path.join(HERE, f'{prefix}_summary.csv'), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
-        w.writerow(['飯店', '區域', '位置', 'Agoda評分', '評鑑數', '稅率'] + [f'{nl(n)} 含稅' for n in NIGHTS] + [f'平均 {s}' for s, _ in STAYS])
+        w.writerow(['飯店', '區域', '位置', 'Agoda評分', '評鑑數', '稅率'] + [f'{nl(n)} 含稅' for n in nights] + [f'平均 {s}' for s, _ in stays])
         for k, disp, area, loc, mt, best, price, avgs in rows:
-            w.writerow([disp, area, loc, mt.get('rating', ''), mt.get('reviews', ''), mt['ratio']] + [price[n] or '無空房' for n in NIGHTS] + [a or '' for a in avgs])
+            w.writerow([disp, area, loc, mt.get('rating', ''), mt.get('reviews', ''), mt['ratio']] + [price[n] or '無空房' for n in nights] + [a or '' for a in avgs])
 
     def td(v, budget=False):
         if v is None: return "<td class='num na'>無空房</td>"
@@ -138,7 +164,7 @@ def main(group='jongno'):
     trs = ''.join(
         f"<tr class='{'dd' if area in ('東大門', '弘大') else ''}'><td><b>{disp}</b><br><span class='s'>{area}・{loc}・Agoda {mt.get('rating', '?')}（{mt.get('reviews', 0):,} 篇）"
         f"・稅率 {'%.0f' % ((mt['ratio'] - 1) * 100)}%{'' if mt['ratio_ok'] else '(估)'}</span></td>"
-        + ''.join(f"<td class='num'>{'—' if price[n] is None else f'{price[n]:,}'}<br>{room_cell(best[n])}</td>" for n in NIGHTS)
+        + ''.join(f"<td class='num{' ok' if not stays and price[n] and price[n] <= BUDGET else ''}'>{'—' if price[n] is None else f'{price[n]:,}'}<br>{room_cell(best[n])}</td>" for n in nights)
         + ''.join(td(a, True) for a in avgs) + '</tr>'
         for k, disp, area, loc, mt, best, price, avgs in rows)
     html = f"""<!doctype html><html><head><meta charset='utf-8'><style>
@@ -149,12 +175,12 @@ table{{border-collapse:collapse}} th,td{{border:1px solid #ccc;padding:4px 8px;v
 .foot{{color:#555;font-size:12px;margin-top:8px;line-height:1.5;max-width:1250px}}</style></head><body>
 <h1>{gtitle}飯店 Agoda 含稅房價（每晚預算 NT${BUDGET:,}）</h1>
 <div class='sub'>Agoda 1 位大人・1 間房，每晚最便宜的可訂房型（已排除青旅、膠囊、宿舍、限女性與共用房）；<b>含稅價</b>＝不含稅價 × 該飯店結帳頁實際稅率。綠＝平均 ≤ {BUDGET:,}；藍底＝{'東大門' if group == 'jongno' else '弘大'}。依 2 晚平均排序。</div>
-<table><tr><th>飯店</th>{''.join(f'<th>{nl(n)}</th>' for n in NIGHTS)}{''.join(f'<th>平均 {s}</th>' for s, _ in STAYS)}</tr>{trs}</table>
+<table><tr><th>飯店</th>{''.join(f'<th>{nl(n)}</th>' for n in nights)}{''.join(f'<th>平均 {s}</th>' for s, _ in stays)}</tr>{trs}</table>
 <div class='foot'>已排除：{gexcl}{('、' + '、'.join(dorm_only) + '（只有膠囊／宿舍／女性房）') if dorm_only else ''}{('、' + '、'.join(low_rev) + f'（Agoda 評鑑 < {MIN_REVIEWS}）') if low_rev else ''}。
 2026-10-24 Agoda 抓取；最低價多為不可退款方案，可免費取消方案另加價。{('未完成：' + '、'.join(problems)) if problems else ''}</div></body></html>"""
     open(os.path.join(HERE, 'agoda_jongno.html' if group == 'jongno' else f'{prefix}.html'), 'w').write(html)
     for k, disp, area, loc, mt, best, price, avgs in rows:
-        print(f"{disp:24} {area} ★{mt.get('rating')}({mt.get('reviews')}) tax={mt['ratio']} {[price[n] for n in NIGHTS]} avg={avgs}")
+        print(f"{disp:24} {area} ★{mt.get('rating')}({mt.get('reviews')}) tax={mt['ratio']} {[price[n] for n in nights]} avg={avgs}")
     print('low reviews', low_rev); print('problems', problems)
 
 if __name__ == '__main__':
