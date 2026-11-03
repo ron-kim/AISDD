@@ -4,7 +4,7 @@ export AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium
 OUT="$(dirname "$0")/raw_rt"; mkdir -p $OUT
 PAIRS="2026-12-31:2027-01-02 2026-12-31:2027-01-03 2026-12-31:2027-01-04 2026-12-31:2027-01-05 2027-01-01:2027-01-02 2027-01-01:2027-01-03 2027-01-01:2027-01-04 2027-01-01:2027-01-05 2027-01-02:2027-01-03 2027-01-02:2027-01-04 2027-01-02:2027-01-05 2027-01-03:2027-01-04 2027-01-03:2027-01-05"
 grab(){ # $1 = substring that must appear in labels; poll up to ~30s
-  for k in 1 2 3 4 5 6 7 8 9 10; do
+  for k in $(seq 1 20); do
     r=$(agent-browser eval "JSON.stringify($LIST.map(e=>e.getAttribute('aria-label')))" 2>/dev/null)
     echo "$r" | grep -q "$1" && { echo "$r"; return; }
     echo "$r" | grep -q '找不到' && break
@@ -30,11 +30,14 @@ def pr(s): return int(re.search(r"(\d+) 新台幣",s).group(1))
 def al(s):
   m=re.search(r"搭乘(.+?)的直達航班",s); return m.group(1) if m else "?"
 c=[(pr(s),i,t(s),al(s)) for i,s in enumerate(L) if "直達" in s and "分段購票" not in s and "新台幣" in s]
-# 每家航空各取最便宜的一班去程（依價格取前 MAX_AIRLINES 家），再補最便宜的早班（09:30 前）
-best={}
-for x in sorted(c):
-  best.setdefault(x[3],x)
-sel=[x[1] for x in sorted(best.values())][:int(__import__("os").environ.get("MAX_AIRLINES","6"))]
+# 只點重點航空（PICK_AIRLINES）各自最便宜的一班，再加上全體最便宜與最便宜的早班（09:30 前）
+import os
+want=[a for a in os.environ.get("PICK_AIRLINES","台灣虎航,酷航,韓亞航空,大韓航空,真航空").split(",") if a]
+sel=[]
+if c: sel.append(min(c)[1])
+for a in want:
+  m=[x for x in c if a in x[3]]
+  if m and min(m)[1] not in sel: sel.append(min(m)[1])
 e=[x for x in c if x[2]<=570]
 if e and min(e)[1] not in sel: sel.append(min(e)[1])
 print(" ".join(map(str,sel)))')
