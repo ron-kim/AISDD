@@ -27,9 +27,14 @@ def t(s):
   h=int(m.group(2))%12; h+= 12 if m.group(1) in("下午","晚上") or (m.group(1)=="中午" and h<11) else 0
   return h*60+int(m.group(3))
 def pr(s): return int(re.search(r"(\d+) 新台幣",s).group(1))
-c=[(pr(s),i,t(s)) for i,s in enumerate(L) if "直達" in s and "分段購票" not in s]
-sel=[]
-if c: sel.append(min(c)[1])
+def al(s):
+  m=re.search(r"搭乘(.+?)的直達航班",s); return m.group(1) if m else "?"
+c=[(pr(s),i,t(s),al(s)) for i,s in enumerate(L) if "直達" in s and "分段購票" not in s and "新台幣" in s]
+# 每家航空各取最便宜的一班去程（依價格取前 MAX_AIRLINES 家），再補最便宜的早班（09:30 前）
+best={}
+for x in sorted(c):
+  best.setdefault(x[3],x)
+sel=[x[1] for x in sorted(best.values())][:int(__import__("os").environ.get("MAX_AIRLINES","6"))]
 e=[x for x in c if x[2]<=570]
 if e and min(e)[1] not in sel: sel.append(min(e)[1])
 print(" ".join(map(str,sel)))')
