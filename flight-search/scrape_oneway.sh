@@ -13,13 +13,16 @@ for j in "${jobs[@]}"; do
   [ -s "$f" ] && continue
   url="https://www.google.com/travel/flights?q=Flights%20from%20$1%20to%20$2%20on%20$3%20one%20way&hl=zh-TW&gl=TW&curr=TWD"
   agent-browser open "$url" >/dev/null 2>&1
+  loaded=
   for k in $(seq 1 20); do sleep 3  # 等結果載入（有票價，或頁面已顯示找不到航班）
     r=$(agent-browser eval "$JS" 2>/dev/null)
     echo "$r" | grep -q '新台幣' && break
-    agent-browser eval 'document.body.innerText' 2>/dev/null | grep -q '找不到\|沒有符合' && break
+    # 頁面已載入完成（顯示「找到 N 項結果」或「找不到」）但沒有票價 → 再等一輪就放棄，不必等滿上限
+    if agent-browser eval 'document.body.innerText' 2>/dev/null | grep -qE '找到 [0-9]+ 項結果|找不到'; then
+      [ -n "$loaded" ] && break; loaded=1; fi
   done
   echo "$r" > "$f"
   echo "$(date +%T) $j $(echo "$r" | head -c 80)"
-  sleep 24
+  sleep 12  # 每頁間隔（含載入）約 15 秒
 done
 echo DONE

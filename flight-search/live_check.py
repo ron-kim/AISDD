@@ -48,7 +48,7 @@ res = {}
 for name, fn, args in [j for j in jobs if j[0].startswith(os.environ.get("ONLY", ""))]:
     p, note = fn(*args); res[name] = (p, note)
     print(time.strftime('%H:%M:%S'), name, p, note, flush=True)
-    time.sleep(24)
+    time.sleep(12)
 out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live', time.strftime('%Y%m%d-%H%M') + '.json')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 json.dump(res, open(out, 'w'), ensure_ascii=False, indent=1)

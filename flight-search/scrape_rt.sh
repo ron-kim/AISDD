@@ -3,11 +3,14 @@
 export AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium
 OUT="$(dirname "$0")/raw_rt"; mkdir -p $OUT
 PAIRS="2026-12-31:2027-01-02 2026-12-31:2027-01-03 2026-12-31:2027-01-04 2026-12-31:2027-01-05 2027-01-01:2027-01-02 2027-01-01:2027-01-03 2027-01-01:2027-01-04 2027-01-01:2027-01-05 2027-01-02:2027-01-03 2027-01-02:2027-01-04 2027-01-02:2027-01-05 2027-01-03:2027-01-04 2027-01-03:2027-01-05"
-grab(){ # $1 = substring that must appear in labels; poll up to ~30s
+grab(){ # $1 = substring that must appear in labels; poll up to ~60s
+  local loaded=
   for k in $(seq 1 20); do
     r=$(agent-browser eval "JSON.stringify($LIST.map(e=>e.getAttribute('aria-label')))" 2>/dev/null)
     echo "$r" | grep -q "$1" && { echo "$r"; return; }
-    echo "$r" | grep -q '找不到' && break
+    # 頁面已載入完成但沒有符合的項目 → 再等一輪就放棄
+    if agent-browser eval 'document.body.innerText' 2>/dev/null | grep -qE '找到 [0-9]+ 項結果|找不到'; then
+      [ -n "$loaded" ] && break; loaded=1; fi
     sleep 3
   done; echo "$r"; }
 LIST='Array.from(document.querySelectorAll("li div[aria-label]")).filter(e=>e.getAttribute("aria-label").includes("新台幣"))'
@@ -42,7 +45,7 @@ print(" ".join(map(str,sel)))')
   res="{\"out\":$outs,\"picks\":{"
   first=1
   for i in $idx; do
-    sleep 23
+    sleep 12
     agent-browser open "$url" >/dev/null 2>&1; sleep 4; grab 新台幣 >/dev/null
     agent-browser eval "($LIST)[$i].click()" >/dev/null 2>&1; sleep 4
     rets=$(grab "抵達臺")
@@ -51,6 +54,6 @@ print(" ".join(map(str,sel)))')
   done
   echo "$res}}" > "$f"
   echo "$(date +%T) RT $o $a $d1 $d2 picks=[$idx]"
-  sleep 23
+  sleep 12
 done; done
 echo RTDONE
