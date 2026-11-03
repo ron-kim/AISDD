@@ -67,7 +67,7 @@ def parse(label):
     return dict(price=int(g[0]), airline=g[1], dep=dep, arr=arr,
                 frm=AIRPORT.get(g[7], g[7]), to=AIRPORT.get(g[13], g[13]))
 
-PREV = os.path.join(HERE, 'v5')  # 前一版資料：本版沒抓到的查詢沿用它，並用它的 CSV 比較漲跌
+PREV = os.path.join(HERE, 'v6')  # 前一版資料：本版沒抓到的查詢沿用它，並用它的 CSV 比較漲跌
 STALE_OW, STALE_RT = [], []  # 沿用前版的查詢名稱
 
 def read_labels(f):
@@ -237,7 +237,7 @@ tr.top td{{background:#c8f0c8}} tr.rt td{{background:#cfe3ff}} .chip{{padding:1p
 <h1>{title}</h1><div class='sub'>{subtitle}</div><div class='sub'>日期組：{legend}　<span class='chip' style='background:#c8f0c8'>前3名</span><span class='chip' style='background:#cfe3ff'>來回票</span></div>
 <table><tr>{head}</tr>{trs(rows, start=start)}</table>{extra}
 <div class='foot'>總價＝去程＋回程＋行李(每段1件)＋機場⇄首爾站來回交通，單位 NT$，匯率 1 TWD = {KRW_PER_TWD} KRW。行李後加 * 表示含未確認／估算值。<br>交通：{tr_note}<br>
-到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（{FETCHED} 抓取，單程與來回；備註「前版」為 2026-11-02 第 5 版總價）。TSA 只有飛 GMP 的直飛；CJJ 查無台北直飛。<br>
+到達市區＝落地＋入境＋交通；離開市區＝起飛－120分－交通；停留時數＝離開市區－到達市區（已排除未滿 {MIN_STAY} 小時）。資料來源：Google Flights（{FETCHED} 抓取，單程與來回；備註「前版」為 2026-11-03 第 6 版總價）。TSA 只有飛 GMP 的直飛；CJJ 查無台北直飛。<br>
 沿用前版（本版沒抓到）：單程 {'、'.join(STALE_OW) or '無'}；來回 {'、'.join(STALE_RT) or '無'}</div>
 </body></html>"""
 
