@@ -19,6 +19,7 @@ def price(s): return int(re.search(r'(\d+) 新台幣', s).group(1))
 def find(L, airline, clock): return next((i for i, s in enumerate(L) if f'{airline}的直達' in s and clock in s), None)
 def url(q): return 'https://www.google.com/travel/flights?q=' + q.replace(' ', '%20') + '&hl=zh-TW&gl=TW&curr=TWD'
 def rt(o, d, d1, d2, out_air, out_clock, ret_air, ret_clock):
+    ab('open', 'about:blank')  # 先清掉上一頁，避免讀到舊結果
     ab('open', url(f'Flights from {o} to {d} on {d1} through {d2} nonstop'))
     L = wait(lambda L: len(L) > 0)
     i = find(L, out_air, out_clock)
@@ -28,6 +29,7 @@ def rt(o, d, d1, d2, out_air, out_clock, ret_air, ret_clock):
     j = find(R, ret_air, ret_clock)
     return (price(R[j]), '') if j is not None else (None, f'去程 {price(L[i])} 起，但指定回程不在結果中')
 def ow(o, d, day, air, clock):
+    ab('open', 'about:blank')
     ab('open', url(f'Flights from {o} to {d} on {day} one way'))
     L = wait(lambda L: len(L) > 0)
     i = find(L, air, clock)
@@ -48,7 +50,7 @@ res = {}
 for name, fn, args in [j for j in jobs if j[0].startswith(os.environ.get("ONLY", ""))]:
     p, note = fn(*args); res[name] = (p, note)
     print(time.strftime('%H:%M:%S'), name, p, note, flush=True)
-    time.sleep(12)
+    time.sleep(24)  # 12 秒時常被放慢回應，維持 24 秒
 out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live', time.strftime('%Y%m%d-%H%M') + '.json')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 json.dump(res, open(out, 'w'), ensure_ascii=False, indent=1)

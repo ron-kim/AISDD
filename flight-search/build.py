@@ -74,13 +74,22 @@ def read_labels(f):
     try: return json.loads(json.loads(open(f).read())) or []
     except Exception: return []
 
+# 舊版以機場代碼命名（TPE-ICN-…），v7 起以城市命名（Taipei-Seoul-…）；比對前統一換成城市
+CITY = {'TPE': 'Taipei', 'TSA': 'Taipei', 'ICN': 'Seoul', 'GMP': 'Seoul', 'PUS': 'Busan', 'TAE': 'Daegu', 'CJJ': 'Cheongju'}
+def city_name(name):
+    p = name.split('-', 2)
+    return '-'.join([CITY.get(p[0], p[0]), CITY.get(p[1], p[1]), p[2]])
+
 def load_oneway():
     flights, seen = [], set()
-    names = sorted({os.path.basename(f) for d in (os.path.join(HERE, 'raw'), os.path.join(PREV, 'raw')) for f in glob.glob(os.path.join(d, '*.json'))})
-    for name in names:
-        labels, stale = read_labels(os.path.join(HERE, 'raw', name)), False
-        if not labels and read_labels(os.path.join(PREV, 'raw', name)):
-            labels, stale = read_labels(os.path.join(PREV, 'raw', name)), True
+    cur = {os.path.basename(f): f for f in glob.glob(os.path.join(HERE, 'raw', '*.json'))}
+    prev = {}
+    for f in sorted(glob.glob(os.path.join(PREV, 'raw', '*.json'))):
+        prev.setdefault(city_name(os.path.basename(f)), []).append(f)
+    for name in sorted(set(cur) | set(prev)):
+        labels, stale = read_labels(cur[name]) if name in cur else [], False
+        if not labels and any(read_labels(f) for f in prev.get(name, [])):
+            labels, stale = [s for f in prev[name] for s in read_labels(f)], True
             STALE_OW.append(name[:-5])
         for s in labels:
             x = parse(s)
@@ -165,7 +174,7 @@ def build_rt_rows():
     rows, seen = [], set()
     files = [(f, False) for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json')) + glob.glob(os.path.join(HERE, 'raw_rt', '*.json.prev')))]
     for f in sorted(glob.glob(os.path.join(PREV, 'raw_rt', '*.json')) + glob.glob(os.path.join(PREV, 'raw_rt', '*.json.prev'))):
-        name = os.path.basename(f).replace('.prev', '')
+        name = city_name(os.path.basename(f).replace('.prev', ''))
         if not rt_complete(os.path.join(HERE, 'raw_rt', name)):  # 本版沒抓完整 → 沿用前版
             files.append((f, True))
             if name[:-5] not in STALE_RT: STALE_RT.append(name[:-5])
