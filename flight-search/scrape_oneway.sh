@@ -6,7 +6,8 @@ OUT="$(dirname "$0")/raw"
 CITIES="Seoul Busan Daegu Cheongju"
 jobs=()
 for d in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do for a in $CITIES; do jobs+=("Taipei $a $d"); done; done
-for d in 2027-01-02 2027-01-03 2027-01-04 2027-01-05; do for a in $CITIES; do jobs+=("$a Taipei $d"); done; done
+# 回程查到 1/7（1/7 凌晨 00:00–04:59 起飛的深夜班算 1/6 晚上）
+for d in 2027-01-02 2027-01-03 2027-01-04 2027-01-05 2027-01-06 2027-01-07; do for a in $CITIES; do jobs+=("$a Taipei $d"); done; done
 JS='JSON.stringify(Array.from(document.querySelectorAll("li div[aria-label]")).map(e=>e.getAttribute("aria-label")).filter(s=>s.includes("新台幣")))'
 for j in "${jobs[@]}"; do
   set -- $j; f="$OUT/$1-$2-$3.json"
