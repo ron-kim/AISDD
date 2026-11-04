@@ -305,6 +305,8 @@ def main():
         n = p // PAGE + 1
         open(os.path.join(HERE, f'rank_early_late_p{n}.html'), 'w').write(
             html_table(f'{title}　第 {n} 頁（第 {p + 1}–{min(p + PAGE, len(early))} 名）', sub, early[p:p + PAGE], start=p + 1))
+    open(os.path.join(HERE, 'rank_full.html'), 'w').write(
+        html_table(f'完整排行（全部 {len(rows)} 案，依總價）', sub, rows))
     open(os.path.join(HERE, 'rank_all.html'), 'w').write(
         html_table(f'不限時間排行（總價前 60 名／共 {len(rows)} 案）', sub, top60, f'所有來回票方案（{len(rts)} 案）', rts))
     print(f'flights={len(flights)} rows={len(rows)} early={len(early)} rt={len(rts)}')
