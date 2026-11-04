@@ -16,7 +16,7 @@ grab(){ # $1 = substring that must appear in labels; poll up to ~60s
   done; echo "$r"; }
 LIST='Array.from(document.querySelectorAll("li div[aria-label]")).filter(e=>e.getAttribute("aria-label").includes("新台幣"))'
 # 預設航線（以城市查詢：Taipei=TPE+TSA、Seoul=ICN+GMP）
-for r in ${1:-Taipei-Seoul Taipei-Busan Taipei-Daegu Taipei-Cheongju}; do o=${r%-*}; a=${r#*-}
+for r in ${1:-Taipei-Seoul}; do o=${r%-*}; a=${r#*-}
 for p in $PAIRS; do d1=${p%:*}; d2=${p#*:}
   f="$OUT/$o-$a-$d1-$d2.json"; [ -s "$f" ] && continue
   url="https://www.google.com/travel/flights?q=Flights%20from%20$o%20to%20$a%20on%20$d1%20through%20$d2%20nonstop&hl=zh-TW&gl=TW&curr=TWD"

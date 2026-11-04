@@ -40,6 +40,7 @@ COMBO_COLOR = ['#fde2e4', '#fff1c1', '#e2f0cb', '#d7e3fc', '#f1d4f7', '#ffd6a5',
 def combo_label(c): return f"{int(c[0][5:7])}/{int(c[0][8:])}-{int(c[1][5:7])}/{int(c[1][8:])}"
 
 MIN_STAY = 24
+KR_AIRPORTS = {'ICN'}  # 只看台北⇄仁川（要放寬就加入 GMP/PUS/TAE/CJJ）
 FETCHED = '2026-11-04'  # 本版抓取日
 PAGE = 150  # 早去晚回排行每張 PNG 的列數
 EARLY_OUT = time(9, 30)
@@ -155,8 +156,8 @@ def make_row(combo, ob, rb, out_price, ret_price, rt_price=None):
 
 def build_oneway_rows(flights):
     rows = []
-    out = [f for f in flights if f['frm'] in ('TPE', 'TSA') and f['to'] in TRANSPORT]
-    ret = [f for f in flights if f['frm'] in TRANSPORT and f['to'] in ('TPE', 'TSA')]
+    out = [f for f in flights if f['frm'] in ('TPE', 'TSA') and f['to'] in KR_AIRPORTS]
+    ret = [f for f in flights if f['frm'] in KR_AIRPORTS and f['to'] in ('TPE', 'TSA')]
     for c in COMBOS:
         d_out, d_ret = date.fromisoformat(c[0]), date.fromisoformat(c[1])
         obs = [f for f in out if f['dep'].date() == d_out]
@@ -195,7 +196,7 @@ def build_rt_rows():
                 if not rb: continue
                 rd = eff_return_date(rb['dep'])
                 c = (ob['dep'].date().isoformat(), rd.isoformat())
-                if c not in COMBOS: continue
+                if c not in COMBOS or ob['to'] not in KR_AIRPORTS or rb['frm'] not in KR_AIRPORTS: continue
                 k = (c, ob['dep'], ob['airline'], rb['dep'], rb['airline'])
                 if k in seen: continue
                 seen.add(k)
@@ -273,7 +274,7 @@ def manual_rows():
         ob = leg(q['去程日期'], q['去程起飛'], q['去程抵達'], q['去程出發'], q['去程到達'])
         rb = leg(q['回程日期'], q['回程起飛'], q['回程抵達'], q['回程出發'], q['回程到達'])
         c = (ob['dep'].date().isoformat(), eff_return_date(rb['dep']).isoformat())
-        if c in COMBOS: rows.append(make_row(c, ob, rb, None, None, rt_price=int(q['來回票價'])))
+        if c in COMBOS and ob['to'] in KR_AIRPORTS and rb['frm'] in KR_AIRPORTS: rows.append(make_row(c, ob, rb, None, None, rt_price=int(q['來回票價'])))
     return rows
 
 def main():
@@ -296,7 +297,7 @@ def main():
             w.writerow([i, combo_label(r['combo']), r['total'], price_cell(r, 'out_price'), price_cell(r, 'ret_price'), r['bag'],
                         'Y' if r['bag_unconfirmed'] else '', r['transport'], r['out'], r['arrive'], r['ret'], r['leave'], r['stay'],
                         'Y' if r['early_late'] else '', 'Y' if r['rt'] is not None else '', r['prev'] or '', r['note']])
-    sub = '1 成人經濟艙・只看直飛・TPE/TSA ⇄ ICN/GMP/CJJ/TAE/PUS・12/31–1/6 涵蓋 1/2 或 1/3・停留 ≥ 24 小時'
+    sub = '1 成人經濟艙・只看直飛・台北 ⇄ ' + '/'.join(sorted(KR_AIRPORTS)) + '・12/31–1/6 涵蓋 1/2 或 1/3・停留 ≥ 24 小時'
     title = f'早去晚回排行（去程 ≤09:30、回程 ≥18:00，共 {len(early)} 案）'
     open(os.path.join(HERE, 'rank_early_late.html'), 'w').write(html_table(title, sub, early))
     for old in glob.glob(os.path.join(HERE, 'rank_early_late_p*.html')): os.remove(old)

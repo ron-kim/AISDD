@@ -3,7 +3,7 @@ export AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium
 export NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt
 OUT="$(dirname "$0")/raw"
 # 以城市查詢：Taipei 涵蓋 TPE+TSA，Seoul 涵蓋 ICN+GMP（一頁同時列出兩個機場）
-CITIES="Seoul Busan Daegu Cheongju"
+CITIES=${CITIES:-"Seoul"}  # 只看台北⇄首爾（仁川）；要放寬可設 CITIES="Seoul Busan Daegu Cheongju"
 jobs=()
 for d in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do for a in $CITIES; do jobs+=("Taipei $a $d"); done; done
 # 回程查到 1/7（1/7 凌晨 00:00–04:59 起飛的深夜班算 1/6 晚上）
