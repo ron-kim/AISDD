@@ -144,6 +144,7 @@ def make_row(combo, ob, rb, out_price, ret_price, rt_price=None):
     if rb['dep'].time() < time(5): notes.append('回程深夜班(算前一晚)')
     if ob['to'] != rb['frm']: notes.append(f"{ob['to']}進{rb['frm']}出")
     if ob.get('stale') or rb.get('stale'): notes.append('沿用前版票價')
+    if ob.get('manual'): notes.append('手動報價：' + ob['manual'])
     bag_note = sorted({s for s in (so, sr) if s.startswith('未確認')})
     notes += ['行李' + s for s in bag_note]
     return dict(combo=combo, total=fare + bo + br + tr, out_price=out_price, ret_price=ret_price, rt=rt_price,
@@ -259,9 +260,25 @@ def load_prev():
     return {row_key(r['日期組'], r['去程'], r['回程'], r['來回票'] == 'Y'): (int(r['總價']), int(r['名次']))
             for r in csv.DictReader(open(f, encoding='utf-8-sig'))}
 
+def manual_rows():
+    """manual_quotes.csv：爬蟲拿不到價格（Google 顯示「無法提供價格資訊」）時，以使用者提供的來回報價補上。"""
+    f = os.path.join(HERE, 'manual_quotes.csv')
+    if not os.path.exists(f): return []
+    rows = []
+    for q in csv.DictReader(open(f, encoding='utf-8')):
+        def leg(day, dep, arr, frm, to):
+            d = datetime.combine(date.fromisoformat(day), hm(dep)); a = datetime.combine(d.date(), hm(arr))
+            if a < d: a += timedelta(days=1)
+            return dict(price=None, airline=q['航空公司'], dep=d, arr=a, frm=frm, to=to, manual=f"{q['來源']}；{q['備註']}")
+        ob = leg(q['去程日期'], q['去程起飛'], q['去程抵達'], q['去程出發'], q['去程到達'])
+        rb = leg(q['回程日期'], q['回程起飛'], q['回程抵達'], q['回程出發'], q['回程到達'])
+        c = (ob['dep'].date().isoformat(), eff_return_date(rb['dep']).isoformat())
+        if c in COMBOS: rows.append(make_row(c, ob, rb, None, None, rt_price=int(q['來回票價'])))
+    return rows
+
 def main():
     flights = load_oneway()
-    rows = [r for r in build_oneway_rows(flights) + build_rt_rows() if r['stay'] >= MIN_STAY]
+    rows = [r for r in build_oneway_rows(flights) + build_rt_rows() + manual_rows() if r['stay'] >= MIN_STAY]
     rows.sort(key=lambda r: (r['total'], r['stay'] * -1))
     prev = load_prev()
     for r in rows:
