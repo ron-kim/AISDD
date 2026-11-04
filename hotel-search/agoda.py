@@ -48,6 +48,7 @@ HOTELS = {  # key → (顯示名, 區域, 位置)
     'airportel': ('仁川 Airportel', '仁川', '永宗島'),
     'icnairtel': ('仁川機場 Airtel', '仁川', '永宗島'),
     'abest': ('Abest Premium 永宗島', '仁川', '永宗島'),
+    'firststay': ('Hotel Firststay Hongdae（First Stay，追蹤中）', '新村', '延世路 2 街路 12'),
     'thezip': ('THEZIP 首爾', '新村', '新村／弘大'),
     'urban': ('新村 Urban Hotel & Play', '新村', '新村站'),
     'havenue': ('H Avenue 梨大新村', '新村', '梨大站'),
