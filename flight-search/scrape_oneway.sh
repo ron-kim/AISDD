@@ -24,6 +24,6 @@ for j in "${jobs[@]}"; do
   done
   echo "$r" > "$f"
   echo "$(date +%T) $j $(echo "$r" | head -c 80)"
-  sleep 12  # 每頁間隔（含載入）約 15 秒
+  sleep 24  # 每頁間隔約 30 秒；12 秒時曾被 Google 判定異常流量
 done
 echo DONE

@@ -46,7 +46,7 @@ print(" ".join(map(str,sel)))')
   res="{\"out\":$outs,\"picks\":{"
   first=1
   for i in $idx; do
-    sleep 12
+    sleep 24
     agent-browser open "$url" >/dev/null 2>&1; sleep 4; grab 新台幣 >/dev/null
     agent-browser eval "($LIST)[$i].click()" >/dev/null 2>&1; sleep 4
     rets=$(grab "抵達臺")
@@ -55,6 +55,6 @@ print(" ".join(map(str,sel)))')
   done
   echo "$res}}" > "$f"
   echo "$(date +%T) RT $o $a $d1 $d2 picks=[$idx]"
-  sleep 12
+  sleep 24  # 12 秒時曾被 Google 判定異常流量
 done; done
 echo RTDONE
