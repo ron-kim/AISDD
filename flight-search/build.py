@@ -82,12 +82,20 @@ def city_name(name):
     p = name.split('-', 2)
     return '-'.join([CITY.get(p[0], p[0]), CITY.get(p[1], p[1]), p[2]])
 
+CITY_AIRPORTS = {'Seoul': {'ICN', 'GMP'}, 'Busan': {'PUS'}, 'Daegu': {'TAE'}, 'Cheongju': {'CJJ'}}
+def in_scope(name):
+    """查詢檔名（城市-城市-日期…）是否涉及目前要看的韓國機場。"""
+    a, b = name.split('-')[:2]
+    return any(CITY_AIRPORTS.get(c, set()) & KR_AIRPORTS for c in (a, b))
+
 def load_oneway():
     flights, seen = [], set()
     cur = {os.path.basename(f): f for f in glob.glob(os.path.join(HERE, 'raw', '*.json'))}
     prev = {}
     for f in sorted(glob.glob(os.path.join(PREV, 'raw', '*.json'))):
-        prev.setdefault(city_name(os.path.basename(f)), []).append(f)
+        n = city_name(os.path.basename(f))
+        if not in_scope(n): continue  # 不在目前範圍（KR_AIRPORTS）的城市不沿用
+        prev.setdefault(n, []).append(f)
     for name in sorted(set(cur) | set(prev)):
         labels, stale = read_labels(cur[name]) if name in cur else [], False
         if not labels and any(read_labels(f) for f in prev.get(name, [])):
@@ -178,6 +186,7 @@ def build_rt_rows():
     files = [(f, False) for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json')) + glob.glob(os.path.join(HERE, 'raw_rt', '*.json.prev')))]
     for f in sorted(glob.glob(os.path.join(PREV, 'raw_rt', '*.json')) + glob.glob(os.path.join(PREV, 'raw_rt', '*.json.prev'))):
         name = city_name(os.path.basename(f).replace('.prev', ''))
+        if not in_scope(name): continue
         if not rt_complete(os.path.join(HERE, 'raw_rt', name)):  # 本版沒抓完整 → 沿用前版
             files.append((f, True))
             if name[:-5] not in STALE_RT: STALE_RT.append(name[:-5])
