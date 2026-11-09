@@ -3,7 +3,7 @@
 export AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium
 OUT="$(dirname "$0")/raw_rt"; mkdir -p $OUT
 # 去程 12/31–1/3；回程查詢日 1/2–1/7（1/7 用來抓 1/6 晚上的深夜班）
-PAIRS=$(for o in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do for r in 2027-01-02 2027-01-03 2027-01-04 2027-01-05 2027-01-06 2027-01-07; do [[ "$r" > "$o" ]] && echo -n "$o:$r "; done; done)
+PAIRS=${PAIRS:-$(for o in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do for r in 2027-01-02 2027-01-03 2027-01-04 2027-01-05 2027-01-06 2027-01-07; do [[ "$r" > "$o" ]] && echo -n "$o:$r "; done; done)}
 grab(){ # $1 = substring that must appear in labels; poll up to ~60s
   local loaded=
   for k in $(seq 1 20); do
