@@ -46,6 +46,8 @@ jobs = [
  ('OW 酷航 1/4 22:55 ICN→TPE', ow, ('ICN','TPE','2027-01-04','酷航','晚上10:55')),
  ('OW 虎航 1/5 00:30 ICN→TPE', ow, ('ICN','TPE','2027-01-05','台灣虎航','凌晨12:30')),
 ]
+if os.environ.get('JOBS'):  # JOBS=檔案.json：[[名稱, "rt"|"ow", [參數...]], ...] 取代上方預設清單
+    jobs = [(n, {'rt': rt, 'ow': ow}[t], tuple(a)) for n, t, a in json.load(open(os.environ['JOBS']))]
 res = {}
 for name, fn, args in [j for j in jobs if j[0].startswith(os.environ.get("ONLY", ""))]:
     p, note = fn(*args); res[name] = (p, note)
