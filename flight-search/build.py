@@ -153,6 +153,8 @@ def make_row(combo, ob, rb, out_price, ret_price, rt_price=None):
     if rb['dep'].time() < time(5): notes.append('回程深夜班(算前一晚)')
     if ob['to'] != rb['frm']: notes.append(f"{ob['to']}進{rb['frm']}出")
     if ob.get('stale') or rb.get('stale'): notes.append('沿用前版票價')
+    if ob.get('carried') == 'same': notes.append('回程沿用前版(來回最低價未變)')
+    if ob.get('carried') == 'est': notes.append('票價推估(依來回最低價變動，回程未重新確認)')
     if ob.get('manual'): notes.append('手動報價：' + ob['manual'])
     bag_note = sorted({s for s in (so, sr) if s.startswith('未確認')})
     notes += ['行李' + s for s in bag_note]
@@ -178,6 +180,7 @@ def build_oneway_rows(flights):
 def rt_complete(f):
     try: d = json.load(open(f))
     except Exception: return False
+    if 'carried' in d: return bool(d.get('out'))  # 兩階段爬蟲的檔案：有去程列表就算完整（沒點選的沿用前版回程）
     picks = [json.loads(v) if isinstance(v, str) else v for v in (d.get('picks') or {}).values()]
     return bool(picks) and all(picks)
 
@@ -195,8 +198,10 @@ def build_rt_rows():
         except Exception: continue
         dec = lambda v: json.loads(v) if isinstance(v, str) else (v or [])  # eval 結果是 JSON 字串
         outs = dec(data.get('out'))
-        for idx, rets in (data.get('picks') or {}).items():
-            rets = dec(rets)
+        # picks＝本次點選確認的回程；carried＝沒點選、沿用前版的回程（est＝票價依最低價差額推估）
+        entries = [(i, dec(v), None) for i, v in (data.get('picks') or {}).items()]
+        entries += [(i, v.get('rets') or [], 'est' if v.get('est') else 'same') for i, v in (data.get('carried') or {}).items()]
+        for idx, rets, carried in entries:
             ob = parse(outs[int(idx)].replace('來回總價 ', ''))
             if not ob: continue
             for s in rets:
@@ -210,6 +215,7 @@ def build_rt_rows():
                 if k in seen: continue
                 seen.add(k)
                 ob['stale'] = rb['stale'] = stale
+                ob['carried'] = None if stale else carried
                 rows.append(make_row(c, ob, rb, None, None, rt_price=rb['price']))
     return rows
 
@@ -218,6 +224,7 @@ def missing_rt():
     miss = []
     for f in sorted(glob.glob(os.path.join(HERE, 'raw_rt', '*.json'))):
         d = json.load(open(f))
+        if 'carried' in d: continue
         picks = [json.loads(v) if isinstance(v, str) else v for v in (d.get('picks') or {}).values()]
         if not picks or not all(picks):
             n = os.path.basename(f)[:-5].split('-')
