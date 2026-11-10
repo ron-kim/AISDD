@@ -22,8 +22,10 @@ for j in "${jobs[@]}"; do
     if agent-browser eval 'document.body.innerText' 2>/dev/null | grep -qE '找到 [0-9]+ 項結果|找不到'; then
       [ -n "$loaded" ] && break; loaded=1; fi
   done
+  if ! echo "$r" | grep -q 新台幣 && agent-browser eval 'location.href+document.body.innerText' 2>/dev/null | grep -qE '系統發生錯誤|/sorry/|異常流量'; then
+    echo "$(date +%T) THROTTLED：Google 限流，停止"; exit 2; fi
   echo "$r" > "$f"
   echo "$(date +%T) $j $(echo "$r" | head -c 80)"
-  sleep 24  # 每頁間隔約 30 秒；12 秒時曾被 Google 判定異常流量
+  sleep ${GAP:-24}  # 每頁間隔約 30 秒；12 秒時曾被 Google 判定異常流量
 done
 echo DONE

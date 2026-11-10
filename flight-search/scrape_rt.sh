@@ -14,6 +14,10 @@ grab(){ # $1 = substring that must appear in labels; poll up to ~60s
       [ -n "$loaded" ] && break; loaded=1; fi
     sleep 3
   done; echo "$r"; }
+GAP=${GAP:-24}  # 每次查詢間隔秒數；12 秒時曾被 Google 判定異常流量
+LAST_RET=2027-01-07; NIGHT_AIRLINES=${NIGHT_AIRLINES:-台灣虎航}  # 最後一個回程查詢日只用來抓前一晚的深夜班
+throttled(){ agent-browser eval 'location.href+document.body.innerText' 2>/dev/null | grep -qE '系統發生錯誤|/sorry/|異常流量'; }
+stop_throttled(){ echo "$(date +%T) THROTTLED：Google 限流，停止（已抓到的檔案保留，稍後重跑會從這裡接續）"; exit 2; }
 LIST='Array.from(document.querySelectorAll("li div[aria-label]")).filter(e=>e.getAttribute("aria-label").includes("新台幣"))'
 # 預設航線（以城市查詢：Taipei=TPE+TSA、Seoul=ICN+GMP）
 for r in ${1:-Taipei-Seoul}; do o=${r%-*}; a=${r#*-}
@@ -22,6 +26,7 @@ for p in $PAIRS; do d1=${p%:*}; d2=${p#*:}
   url="https://www.google.com/travel/flights?q=Flights%20from%20$o%20to%20$a%20on%20$d1%20through%20$d2%20nonstop&hl=zh-TW&gl=TW&curr=TWD"
   agent-browser open "$url" >/dev/null 2>&1; sleep 4
   outs=$(grab "於.\\{2,12\\}機場出發")
+  echo "$outs" | grep -q 新台幣 || { throttled && stop_throttled; echo "$(date +%T) RT $o $a $d1 $d2 無結果，略過"; sleep $GAP; continue; }
   # choose indices: cheapest direct overall + cheapest direct departing <=09:30
   idx=$(echo "$outs" | python3 -c '
 import sys,json,re
@@ -39,22 +44,30 @@ c=[(pr(s),i,t(s),al(s)) for i,s in enumerate(L) if "直達" in s and "分段購�
 best={}
 for x in sorted(c):
   best.setdefault(x[3],x)
+if sys.argv[1]==sys.argv[2]: best={k:v for k,v in best.items() if k in sys.argv[3].split(",")}  # 只為深夜班而查的回程日
 sel=[x[1] for x in sorted(best.values())][:int(__import__("os").environ.get("MAX_AIRLINES","6"))]
-e=[x for x in c if x[2]<=570]
+e=[x for x in c if x[2]<=570 and sys.argv[1]!=sys.argv[2]]
 if e and min(e)[1] not in sel: sel.append(min(e)[1])
-print(" ".join(map(str,sel)))')
+print(" ".join(map(str,sel)))' "$d2" "$LAST_RET" "$NIGHT_AIRLINES")
   res="{\"out\":$outs,\"picks\":{"
-  first=1
+  first=1; ok=1
   for i in $idx; do
-    sleep 24
-    agent-browser open "$url" >/dev/null 2>&1; sleep 4; grab 新台幣 >/dev/null
+    sleep $GAP
+    # 回到去程列表：先按上一頁（不必重新查詢）；列表和原本不一樣才重開頁面
+    if [ $first = 0 ]; then
+      agent-browser back >/dev/null 2>&1; sleep 3
+      cur=$(agent-browser eval "JSON.stringify($LIST.map(e=>e.getAttribute('aria-label')))" 2>/dev/null)
+      if [ "$cur" != "$outs" ]; then agent-browser open "$url" >/dev/null 2>&1; sleep 4; grab 新台幣 >/dev/null; fi
+    fi
     agent-browser eval "($LIST)[$i].click()" >/dev/null 2>&1; sleep 4
     rets=$(grab "抵達臺")
+    echo "$rets" | grep -q "抵達臺" || { throttled && stop_throttled; ok=0; }
     [ $first = 1 ] || res="$res,"; first=0
     res="$res\"$i\":$rets"
   done
-  echo "$res}}" > "$f"
+  # 有任何一班回程沒抓到就不存檔（下次重跑會補抓，build.py 先沿用前版）
+  [ $ok = 1 ] && [ -n "$idx" ] && echo "$res}}" > "$f"
   echo "$(date +%T) RT $o $a $d1 $d2 picks=[$idx]"
-  sleep 24  # 12 秒時曾被 Google 判定異常流量
+  sleep $GAP
 done; done
 echo RTDONE
