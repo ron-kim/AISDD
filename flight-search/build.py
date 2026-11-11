@@ -41,7 +41,7 @@ def combo_label(c): return f"{int(c[0][5:7])}/{int(c[0][8:])}-{int(c[1][5:7])}/{
 
 MIN_STAY = 24
 KR_AIRPORTS = {'ICN'}  # 只看台北⇄仁川（要放寬就加入 GMP/PUS/TAE/CJJ）
-FETCHED = '2026-11-10'  # 本版抓取日
+FETCHED = '2026-11-11'  # 本版抓取日
 PAGE = 150  # 早去晚回排行每張 PNG 的列數
 EARLY_OUT = time(9, 30)
 LATE_RET = time(18, 0)
