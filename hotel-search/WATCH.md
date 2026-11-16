@@ -15,3 +15,6 @@ cd hotel-search
 HOTELS="firststay:hotel-firststay-hongdae" NIGHTS="2026-12-31 2027-01-01 2027-01-02 2027-01-03 2027-01-04 2027-01-05" ./scrape_agoda.sh
 python3 agoda.py sinchon
 ```
+
+## 2026-11-16 更新
+Agoda 1/1 入住 5 晚（1/1–1/6）**有空房**：高級雙床房 (Superior Twin) 每晚含稅約 NT$4,214（可免費取消），Agoda 9.2 分（2,144 篇）。見 agoda_stay_2027-01-01_5.html。
