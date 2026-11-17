@@ -61,6 +61,14 @@ h1::after{content:"";position:absolute;left:-4px;right:-8px;bottom:4px;height:14
 .pill.p-todo{color:var(--red);border-style:dashed}
 .pill.p-wait{color:var(--blue)}
 
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.themebtn{flex:0 0 auto;min-height:48px;min-width:48px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font:inherit;font-size:16px;color:var(--pencil);background:var(--card);border:2.5px solid var(--pencil);border-radius:var(--wob2);box-shadow:3px 3px 0 var(--pencil);cursor:pointer;transform:rotate(2deg)}
+.themebtn:active{transform:translate(3px,3px) rotate(2deg);box-shadow:none}
+.themebtn:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+.themebtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.themebtn .i-sun{display:none}
+.themebtn.is-dark .i-sun{display:inline}.themebtn.is-dark .i-moon{display:none}
+
 /* date rail */
 nav.days{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:5;padding:8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;background:var(--paper);border:2.5px solid var(--pencil);border-radius:var(--wob2);box-shadow:var(--shadow)}
 nav.days::-webkit-scrollbar{display:none}
@@ -174,7 +182,7 @@ footer ul{margin:0;padding-left:20px}
 
 <div class="wrap">
   <header class="top" id="top">
-    <div class="eyebrow">SEOUL · INCHEON · 남이섬</div>
+    <div class="toprow"><div class="eyebrow">SEOUL · INCHEON · 남이섬</div><button type="button" class="themebtn" id="themebtn" aria-pressed="false"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg><span id="themelbl">深色</span></button></div>
     <h1>首爾跨年行程</h1>
     <div class="meta">
       <span>日期 <b class="mono">2027/1/1（五）– 1/6（三）</b>（候選）</span>
@@ -405,6 +413,17 @@ footer ul{margin:0;padding-left:20px}
 
 <script>
 (function(){
+  // 深色模式開關：記在這台裝置；沒選過就跟隨系統
+  var root = document.documentElement, TKEY = 'seoul-theme';
+  var btn = document.getElementById('themebtn'), lbl = document.getElementById('themelbl');
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function isDark(){ var t = root.getAttribute('data-theme'); return t ? t === 'dark' : !!(mq && mq.matches); }
+  function sync(){ var d = isDark(); btn.classList.toggle('is-dark', d); btn.setAttribute('aria-pressed', d ? 'true' : 'false'); lbl.textContent = d ? '淺色' : '深色'; btn.setAttribute('aria-label', d ? '切換成淺色模式' : '切換成深色模式'); }
+  try { var saved = localStorage.getItem(TKEY); if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved); } catch(e) {}
+  btn.addEventListener('click', function(){ var next = isDark() ? 'light' : 'dark'; root.setAttribute('data-theme', next); try { localStorage.setItem(TKEY, next); } catch(e) {} sync(); });
+  if (mq && mq.addEventListener) mq.addEventListener('change', sync);
+  sync();
+
   // 倒數到 2027/1/1 18:10（台灣時間，UTC+8）
   var dep = Date.UTC(2027,0,1,10,10);
   var cd = document.getElementById('cd');
