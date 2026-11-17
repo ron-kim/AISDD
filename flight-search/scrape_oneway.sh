@@ -5,9 +5,10 @@ OUT="$(dirname "$0")/raw"
 # 以城市查詢：Taipei 涵蓋 TPE+TSA，Seoul 涵蓋 ICN+GMP（一頁同時列出兩個機場）
 CITIES=${CITIES:-"Seoul"}  # 只看台北⇄首爾（仁川）；要放寬可設 CITIES="Seoul Busan Daegu Cheongju"
 jobs=()
-for d in 2026-12-31 2027-01-01 2027-01-02 2027-01-03; do for a in $CITIES; do jobs+=("Taipei $a $d"); done; done
+# 2026-11-17 起只看 1/1–1/6、1/2–1/6：去程 1/1、1/2，回程 1/6（＋1/7 深夜班）
+for d in ${OUT_DAYS:-2027-01-01 2027-01-02}; do for a in $CITIES; do jobs+=("Taipei $a $d"); done; done
 # 回程查到 1/7（1/7 凌晨 00:00–04:59 起飛的深夜班算 1/6 晚上）
-for d in 2027-01-02 2027-01-03 2027-01-04 2027-01-05 2027-01-06 2027-01-07; do for a in $CITIES; do jobs+=("$a Taipei $d"); done; done
+for d in ${RET_DAYS:-2027-01-06 2027-01-07}; do for a in $CITIES; do jobs+=("$a Taipei $d"); done; done
 JS='JSON.stringify(Array.from(document.querySelectorAll("li div[aria-label]")).map(e=>e.getAttribute("aria-label")).filter(s=>s.includes("新台幣")))'
 for j in "${jobs[@]}"; do
   set -- $j; f="$OUT/$1-$2-$3.json"

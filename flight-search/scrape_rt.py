@@ -6,7 +6,7 @@
 其餘去程沿用前版的回程清單：最低價沒變 → 原價沿用；有變 → 依最低價的差額推估（est）。
 
 環境變數：GAP 每次查詢間隔秒數（預設 24）；MAX_CLICKS 第二階段最多點幾班（預設 15）；
-PAIRS 指定日期組 "2026-12-31:2027-01-05 ..."；FORCE_CLICK=1 不管前版，候選全部重點。
+PAIRS 指定日期組 "2027-01-01:2027-01-06 ..."；FORCE_CLICK=1 不管前版，候選全部重點。
 被 Google 限流或要求驗證時立即停止（exit 2）；已抓到的會保留，重跑會接續。
 """
 import json, os, re, subprocess, sys, time
@@ -17,8 +17,8 @@ OUT = os.path.join(HERE, 'raw_rt'); os.makedirs(OUT, exist_ok=True)
 GAP = int(os.environ.get('GAP', 24))
 MAX_CLICKS = int(os.environ.get('MAX_CLICKS', 15))
 MAX_AIRLINES = int(os.environ.get('MAX_AIRLINES', 6))
-OUT_DATES = ['2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03']
-RET_DATES = ['2027-01-02', '2027-01-03', '2027-01-04', '2027-01-05', '2027-01-06', '2027-01-07']
+OUT_DATES = ['2027-01-01', '2027-01-02']  # 2026-11-17 起只看 1/1–1/6、1/2–1/6
+RET_DATES = ['2027-01-06', '2027-01-07']  # 1/7 只用來抓 1/6 晚上的深夜班
 LAST_RET = RET_DATES[-1]            # 這天只用來抓前一晚的深夜班
 NIGHT_AIRLINES = os.environ.get('NIGHT_AIRLINES', '台灣虎航').split(',')
 ENV = dict(os.environ, AGENT_BROWSER_EXECUTABLE_PATH=os.environ.get('AGENT_BROWSER_EXECUTABLE_PATH', '/opt/pw-browsers/chromium'))

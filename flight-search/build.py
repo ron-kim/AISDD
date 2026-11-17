@@ -32,9 +32,8 @@ def baggage(airline, from_tw):
     if '真航空' in airline: return 0, '含15kg'  # 多個非官方來源：台灣航線含 1 件 15kg 免費託運（官網擋爬蟲）
     return KR_LCC_EST, '未確認(估₩45,000)'
 
-# 行程範圍 12/31–1/6，需涵蓋 1/2 或 1/3（去程 12/31–1/3，回程晚於去程且 ≤ 1/6）
-_D = ['2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03', '2027-01-04', '2027-01-05', '2027-01-06']
-COMBOS = [(o, r) for i, o in enumerate(_D[:4]) for r in _D[i + 1:] if r >= '2027-01-02']
+# 行程範圍（2026-11-17 起限縮）：只看 1/1–1/6、1/2–1/6 兩組
+COMBOS = [('2027-01-01', '2027-01-06'), ('2027-01-02', '2027-01-06')]
 COMBO_COLOR = ['#fde2e4', '#fff1c1', '#e2f0cb', '#d7e3fc', '#f1d4f7', '#ffd6a5', '#caffbf', '#bde0fe', '#e9ecef',
                '#ffc8dd', '#cdeac0', '#ffe5b4', '#c9e4de', '#e0c3fc', '#fcd5ce', '#d8e2dc', '#f9dcc4']
 def combo_label(c): return f"{int(c[0][5:7])}/{int(c[0][8:])}-{int(c[1][5:7])}/{int(c[1][8:])}"
@@ -313,7 +312,7 @@ def main():
             w.writerow([i, combo_label(r['combo']), r['total'], price_cell(r, 'out_price'), price_cell(r, 'ret_price'), r['bag'],
                         'Y' if r['bag_unconfirmed'] else '', r['transport'], r['out'], r['arrive'], r['ret'], r['leave'], r['stay'],
                         'Y' if r['early_late'] else '', 'Y' if r['rt'] is not None else '', r['prev'] or '', r['note']])
-    sub = '1 成人經濟艙・只看直飛・台北 ⇄ ' + '/'.join(sorted(KR_AIRPORTS)) + '・12/31–1/6 涵蓋 1/2 或 1/3・停留 ≥ 24 小時'
+    sub = '1 成人經濟艙・只看直飛・台北 ⇄ ' + '/'.join(sorted(KR_AIRPORTS)) + '・只看 1/1–1/6、1/2–1/6・停留 ≥ 24 小時'
     title = f'早去晚回排行（去程 ≤09:30、回程 ≥18:00，共 {len(early)} 案）'
     open(os.path.join(HERE, 'rank_early_late.html'), 'w').write(html_table(title, sub, early))
     for old in glob.glob(os.path.join(HERE, 'rank_early_late_p*.html')): os.remove(old)
