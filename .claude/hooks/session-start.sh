@@ -31,3 +31,14 @@ if command -v claude >/dev/null 2>&1; then
     claude plugin install ecc@ecc --scope user >/dev/null 2>&1 || true
   fi
 fi
+
+# Scrapling (https://github.com/D4Vinci/Scrapling) with its fetchers.
+# patchright needs its own Chromium build; it is added next to the pre-installed ones.
+# Failures are non-fatal so a network hiccup never blocks the session.
+SCRAPLING_VERSION="0.5.1"
+if ! pip show scrapling 2>/dev/null | grep -q "^Version: ${SCRAPLING_VERSION}$"; then
+  pip install -q "scrapling[fetchers]==${SCRAPLING_VERSION}" >/dev/null 2>&1 || true
+fi
+if command -v scrapling >/dev/null 2>&1; then
+  python3 -m patchright install chromium >/dev/null 2>&1 || true
+fi
