@@ -72,3 +72,74 @@ export interface MeetupSuggestion {
   rationale: LocalizedText
   rank: number
 }
+
+export interface PricePoint {
+  date: string
+  price: number
+}
+
+export interface ListingPricing {
+  referencePrice: number
+  history: PricePoint[]
+}
+
+export interface ScheduledPriceChange {
+  listingId: string
+  price: number
+}
+
+export type TransportMode = 'walk' | 'bike' | 'mrt' | 'taxi'
+
+export interface DealPreferences {
+  setupComplete: boolean
+  transportMode: TransportMode
+  alertThresholdPercent: number
+  maxDistanceKm: number
+}
+
+export interface DealQuery {
+  keyword: string
+  budget: number | null
+  categoryId: 'all' | CategoryId
+}
+
+export interface DealEvaluation {
+  listing: Listing
+  transportCost: number
+  landedCost: number
+  referencePrice: number
+  savingsPercent: number
+  lowestRecentPrice: number
+  priceTrend: 'down' | 'flat' | 'up'
+  trustScore: number | null
+  score: number
+  verdict: 'great' | 'good' | 'fair' | 'skip'
+  warnings: Array<'reserved' | 'over-budget' | 'unverified-seller' | 'too-far'>
+}
+
+export interface DealHuntResult {
+  checkedListingIds: string[]
+  picks: DealEvaluation[]
+  ranAt: string
+}
+
+export interface WatchItem {
+  id: string
+  listingId?: string
+  keyword?: string
+  targetPrice: number | null
+  /** Last price seen per matching listing; alerts compare against this. */
+  baselines: Record<string, number>
+  createdAt: string
+}
+
+export interface DealAlert {
+  id: string
+  watchId: string
+  listingId: string
+  oldPrice: number
+  newPrice: number
+  dropPercent: number
+  hitTarget: boolean
+  createdAt: string
+}

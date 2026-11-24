@@ -3,11 +3,13 @@ import { inject, onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import AppShell from '@/components/AppShell.vue'
 import { useLocale } from '@/composables/locale'
+import type { createDealStore } from '@/stores/dealStore'
 import type { createMarketStore } from '@/stores/marketStore'
 
 type MarketStore = ReturnType<typeof createMarketStore>
 
 const marketStore = inject<MarketStore>('marketStore')
+const dealStore = inject<ReturnType<typeof createDealStore>>('dealStore')
 const { t } = useLocale()
 
 onMounted(() => {
@@ -18,6 +20,9 @@ onMounted(() => {
 
   void marketStore.hydrate().catch((error) => {
     console.error('Failed to hydrate market store', error)
+  })
+  void dealStore?.hydrate().catch((error) => {
+    console.error('Failed to hydrate deal store', error)
   })
 })
 </script>

@@ -1,5 +1,13 @@
-import { conversations, listings, meetupSuggestions, sellers, trustProfiles } from '@/data/mockMarket'
-import type { Conversation, Listing, MeetupSuggestion, TrustProfile } from '@/types/market'
+import {
+  conversations,
+  listingPricing,
+  listings,
+  meetupSuggestions,
+  scheduledPriceRounds,
+  sellers,
+  trustProfiles,
+} from '@/data/mockMarket'
+import type { Conversation, Listing, ListingPricing, MeetupSuggestion, ScheduledPriceChange, TrustProfile } from '@/types/market'
 
 const pause = (ms = 160) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
@@ -31,5 +39,14 @@ export const marketService = {
   async getMeetupSuggestions(listingId: string): Promise<MeetupSuggestion[]> {
     await pause(120)
     return meetupSuggestions[listingId] ?? []
+  },
+  async getListingPricing(): Promise<Record<string, ListingPricing>> {
+    await pause(80)
+    return structuredClone(listingPricing)
+  },
+  /** Simulated feed of seller price changes; round `n` returns the n-th batch (empty once exhausted). */
+  async fetchPriceUpdates(round: number): Promise<ScheduledPriceChange[]> {
+    await pause(220)
+    return scheduledPriceRounds[round] ?? []
   },
 }

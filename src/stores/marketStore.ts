@@ -1,5 +1,5 @@
 import { computed, reactive, ref } from 'vue'
-import { categoryOrder, conversations as conversationFixtures, listings as listingFixtures } from '@/data/mockMarket'
+import { categoryOrder, conversations as conversationFixtures, listings as listingFixtures, sellers } from '@/data/mockMarket'
 import { getCountyOption, getDistrictOption } from '@/data/taiwanLocations'
 import { categoryLabel, formatClock, t, text } from '@/composables/locale'
 import { marketService } from '@/services/marketService'
@@ -166,6 +166,26 @@ export function createMarketStore() {
     }
   }
 
+  /** Open the conversation for a listing, starting an empty one if none exists yet. */
+  async function ensureConversation(listingId: string) {
+    await loadConversation(listingId)
+    if (conversations.value.some((item) => item.listingId === listingId)) return
+    const listing = listings.value.find((item) => item.id === listingId)
+    if (!listing) return
+    const conversation: Conversation = {
+      id: `c-${listingId}`,
+      listingId,
+      buyerName: t('chat.buyerName'),
+      sellerName: sellers[listing.sellerId]?.name ?? t('common.unknownSeller'),
+      online: true,
+      unread: 0,
+      updatedAt: formatClock(),
+      messages: [],
+    }
+    conversations.value = [conversation, ...conversations.value]
+    activeConversationId.value = conversation.id
+  }
+
   async function sendMessage(messageText: string) {
     const current = activeConversation.value
     if (!current || !messageText.trim()) return
@@ -235,6 +255,7 @@ export function createMarketStore() {
     setCountyFilter,
     setDistrictFilter,
     loadConversation,
+    ensureConversation,
     sendMessage,
     chooseMeetupPoint,
     trustProfiles,

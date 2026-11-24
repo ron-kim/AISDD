@@ -1,4 +1,12 @@
-import type { Conversation, Listing, MeetupSuggestion, SellerProfile, TrustProfile } from '@/types/market'
+import type {
+  Conversation,
+  Listing,
+  ListingPricing,
+  MeetupSuggestion,
+  ScheduledPriceChange,
+  SellerProfile,
+  TrustProfile,
+} from '@/types/market'
 
 const text = (zhTW: string, en: string) => ({ 'zh-TW': zhTW, en })
 
@@ -104,6 +112,82 @@ export const listings: Listing[] = [
     sellerId: 's1',
     tags: [text('熱門', 'Popular'), text('可立即取件', 'Ready for pickup'), text('社區信任', 'Community trusted')],
     meetupHint: text('永春市場對面咖啡館', 'Cafe across from Yongchun Market'),
+  },
+  {
+    id: 'teak-chair',
+    title: text('柚木扶手單椅', 'Teak armchair'),
+    categoryId: 'furniture',
+    countyId: 'taipei-city',
+    districtId: 'daan-district',
+    price: 1500,
+    distanceKm: 3.4,
+    status: 'active',
+    description: text(
+      '實木扶手椅，坐墊有輕微使用痕跡，整體結構穩固。',
+      'Solid wood armchair. The cushion shows light wear, but the frame is sturdy.',
+    ),
+    location: text('大安區・師大商圈', 'Da’an District · Shida area'),
+    coordinates: { x: 62, y: 66 },
+    sellerId: 's2',
+    tags: [text('實木', 'Solid wood'), text('可議價', 'Negotiable'), text('週末可約', 'Weekend meetup')],
+    meetupHint: text('師大路口便利商店前', 'In front of the convenience store at Shida Road'),
+  },
+  {
+    id: 'rattan-lamp',
+    title: text('藤編落地燈', 'Rattan floor lamp'),
+    categoryId: 'decor',
+    countyId: 'taipei-city',
+    districtId: 'zhongshan-district',
+    price: 990,
+    distanceKm: 2.1,
+    status: 'active',
+    description: text(
+      '暖光落地燈，燈罩完整，附原廠燈泡。',
+      'Warm-light floor lamp with an intact shade and the original bulb.',
+    ),
+    location: text('中山區・行天宮', 'Zhongshan District · Xingtian Temple'),
+    coordinates: { x: 48, y: 40 },
+    sellerId: 's3',
+    tags: [text('附燈泡', 'Bulb included'), text('近捷運', 'Near MRT')],
+    meetupHint: text('行天宮捷運站 3 號出口', 'Xingtian Temple MRT exit 3'),
+  },
+  {
+    id: 'pine-rack',
+    title: text('松木鞋架', 'Pine shoe rack'),
+    categoryId: 'storage',
+    countyId: 'taipei-city',
+    districtId: 'songshan-district',
+    price: 450,
+    distanceKm: 1.9,
+    status: 'ready-today',
+    description: text(
+      '三層松木鞋架，可放 9 雙鞋，搬家出清。',
+      'Three-tier pine shoe rack that holds 9 pairs. Moving-out sale.',
+    ),
+    location: text('松山區・饒河街', 'Songshan District · Raohe Street'),
+    coordinates: { x: 22, y: 58 },
+    sellerId: 's2',
+    tags: [text('搬家出清', 'Moving sale'), text('今日可取', 'Pickup today')],
+    meetupHint: text('松山車站南口', 'Songshan Station south exit'),
+  },
+  {
+    id: 'ceramic-vase',
+    title: text('手作陶瓷花器', 'Handmade ceramic vase'),
+    categoryId: 'decor',
+    countyId: 'taipei-city',
+    districtId: 'xinyi-district',
+    price: 380,
+    distanceKm: 1.4,
+    status: 'active',
+    description: text(
+      '在地工作室手作花器，無裂痕，適合乾燥花。',
+      'Handmade by a local studio. No cracks, great for dried flowers.',
+    ),
+    location: text('信義區・四四南村', 'Xinyi District · Four Four South Village'),
+    coordinates: { x: 80, y: 44 },
+    sellerId: 's1',
+    tags: [text('手作', 'Handmade'), text('小物', 'Small item')],
+    meetupHint: text('四四南村廣場', 'Four Four South Village plaza'),
   },
 ]
 
@@ -249,4 +333,34 @@ export const conversations: Conversation[] = [
       { id: 'm6', author: 'seller', text: text('可以，我 15 分鐘內到。', 'Yes, I can be there within 15 minutes.'), time: '09:35', state: 'delivered' },
     ],
   },
+]
+
+const history = (...points: Array<[string, number]>) => points.map(([date, price]) => ({ date, price }))
+
+/** Reference new-retail prices and recent price history, used by the deal hunter. */
+export const listingPricing: Record<string, ListingPricing> = {
+  'cedar-chair': { referencePrice: 4800, history: history(['2026-10-28', 2200], ['2026-11-08', 1990], ['2026-11-18', 1800]) },
+  'bamboo-lamp': { referencePrice: 1680, history: history(['2026-10-30', 650], ['2026-11-12', 650], ['2026-11-20', 650]) },
+  'linen-rack': { referencePrice: 2590, history: history(['2026-10-25', 1100], ['2026-11-05', 1200], ['2026-11-19', 1200]) },
+  'oak-shelf': { referencePrice: 2200, history: history(['2026-11-01', 1180], ['2026-11-15', 980]) },
+  'teak-chair': { referencePrice: 4200, history: history(['2026-11-03', 1500], ['2026-11-21', 1500]) },
+  'rattan-lamp': { referencePrice: 2600, history: history(['2026-10-29', 1290], ['2026-11-10', 1090], ['2026-11-22', 990]) },
+  'pine-rack': { referencePrice: 1290, history: history(['2026-11-14', 520], ['2026-11-23', 450]) },
+  'ceramic-vase': { referencePrice: 980, history: history(['2026-11-06', 380]) },
+}
+
+/**
+ * Simulated seller price updates. Each watchlist check consumes the next round,
+ * standing in for a backend feed of price changes.
+ */
+export const scheduledPriceRounds: ScheduledPriceChange[][] = [
+  [
+    { listingId: 'cedar-chair', price: 1550 },
+    { listingId: 'linen-rack', price: 1150 },
+  ],
+  [
+    { listingId: 'bamboo-lamp', price: 520 },
+    { listingId: 'teak-chair', price: 1290 },
+  ],
+  [],
 ]

@@ -7,10 +7,12 @@ import SectionCard from '@/components/SectionCard.vue'
 import TrustScoreCard from '@/components/TrustScoreCard.vue'
 import { sellers } from '@/data/mockMarket'
 import { categoryLabel, formatCurrency, t, text } from '@/composables/locale'
+import type { createDealStore } from '@/stores/dealStore'
 import type { createMarketStore } from '@/stores/marketStore'
 
 type MarketStore = ReturnType<typeof createMarketStore>
 const marketStore = inject<MarketStore>('marketStore')
+const dealStore = inject<ReturnType<typeof createDealStore>>('dealStore')
 const route = useRoute()
 
 const listingId = computed(() => String(route.params.id))
@@ -42,6 +44,18 @@ function chooseMeetup(id: string) {
           {{ t('listing.startChat') }}
         </RouterLink>
         <RouterLink to="/meetup" class="secondary-btn">{{ t('listing.chooseMeetup') }}</RouterLink>
+        <RouterLink :to="{ path: '/deals', query: { check: listing.id } }" class="secondary-btn">
+          {{ t('deals.checkDeal') }}
+        </RouterLink>
+        <button
+          v-if="dealStore"
+          class="ghost-btn"
+          type="button"
+          :disabled="dealStore.isWatchingListing(listing.id)"
+          @click="dealStore.addWatch({ listingId: listing.id, targetPrice: null })"
+        >
+          {{ dealStore.isWatchingListing(listing.id) ? t('deals.watching') : t('deals.watchThis') }}
+        </button>
       </div>
     </section>
 

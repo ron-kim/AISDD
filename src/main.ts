@@ -6,6 +6,7 @@ import { initTheme } from './composables/theme'
 import './styles/theme.css'
 import { routes } from './router'
 import { createMarketStore } from './stores/marketStore'
+import { createDealStore } from './stores/dealStore'
 
 initLocale()
 initTheme()
@@ -18,6 +19,9 @@ const router = createRouter({
 const app = createApp(App)
 const marketStore = createMarketStore()
 
+const dealStore = createDealStore(marketStore)
+
 app.provide('marketStore', marketStore)
+app.provide('dealStore', dealStore)
 app.use(router)
 app.mount('#app')

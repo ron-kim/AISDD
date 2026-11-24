@@ -22,6 +22,7 @@ const { isDark, toggleTheme } = useTheme()
           {{ isEnglish ? t('language.switchToChinese') : t('language.switchToEnglish') }}
         </button>
         <RouterLink to="/" class="nav-link">{{ t('nav.browse') }}</RouterLink>
+        <RouterLink to="/deals" class="nav-link">{{ t('nav.deals') }}</RouterLink>
         <RouterLink to="/map" class="nav-link">{{ t('nav.map') }}</RouterLink>
         <RouterLink to="/chat" class="nav-link">{{ t('nav.chat') }}</RouterLink>
         <RouterLink to="/meetup" class="nav-link">{{ t('nav.meetup') }}</RouterLink>
