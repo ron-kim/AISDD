@@ -68,6 +68,8 @@ HOTELS = {  # key → (顯示名, 區域, 位置)
     'venueg': ('Venue G 飯店', '鐘路', '東大門站／鐘路5街（使用者指定）'),
     'onustay': ('ONU STAY 益善', '鐘路', '益善洞（使用者指定）'),
     'nafore': ('納法爾飯店 Hotel Nafore', '鐘路', '清溪川／鐘路3街（使用者指定）'),
+    'atrium': ('首爾鐘路中庭飯店 Hotel Atrium', '鐘路', '鐘路（使用者指定）'),
+    'ewhagrand': ('梨大首爾大旅館 Seoul Grand Hostel', '新村', '梨大站（使用者指定）'),
 }
 GROUP_NIGHTS = {  # 只看部分晚數的組：(入住晚, 多晚平均欄)
     'incheon': (['2027-01-02', '2027-01-03'], []),
