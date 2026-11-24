@@ -198,7 +198,7 @@ footer ul{margin:0;padding-left:20px}
       <span>重點 <b>한로로 5th 단독콘서트〔물음표〕</b>・NAVER Arena at INSPIRE</span>
     </div>
     <div class="status" aria-label="目前進度">
-      <span class="pill p-ok">機票：長榮 BR156／BR155</span>
+      <span class="pill p-ok">機票：已訂（長榮 BR156／BR155）</span>
       <span class="pill p-todo">住宿：未訂</span>
       <span class="pill p-wait">演唱會：場次待定（1/2 或 1/3）</span>
     </div>
@@ -225,7 +225,7 @@ footer ul{margin:0;padding-left:20px}
       </ul>
       <h3>機票與住宿</h3>
       <ul class="checks">
-        <li><input type="checkbox" id="c-flight2" checked><label for="c-flight2">機票：長榮 BR156（1/2 松山→金浦）／BR155（1/6 金浦→松山）</label></li>
+        <li><input type="checkbox" id="c-flight2" checked><label for="c-flight2">機票已訂：長榮 BR156（1/2 松山→金浦）／BR155（1/6 金浦→松山）</label></li>
         <li><input type="checkbox" id="c-seat"><label for="c-seat">長榮線上選位、確認托運行李額度（經濟艙一般為 23kg）</label></li>
         <li><input type="checkbox" id="c-hotel"><label for="c-hotel">訂 1/2–1/6 可免費取消的房間（見「住宿」：Yaja 2,939、Venue G 3,298、納法爾 3,421、ONU STAY 約 3,467）</label></li>
         <li><input type="checkbox" id="c-flash"><label for="c-flash">Agoda 11/27 單日閃購再查一次，有更便宜就改訂<span class="due">11/27</span></label></li>
@@ -296,7 +296,7 @@ footer ul{margin:0;padding-left:20px}
   </section>
 
   <section class="block" id="flight">
-    <h2>航班</h2>
+    <h2>航班（已訂）</h2>
     <p class="sub">長榮航空，台北松山 ⇄ 首爾金浦直飛。兩座都是市區機場，比桃園⇄仁川近很多。</p>
     <div class="fl-grid">
       <div class="flc glass pick">
@@ -516,7 +516,7 @@ footer ul{margin:0;padding-left:20px}
   var KEY = 'seoul-todo-v1', state = {};
   try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e) {}
   document.querySelectorAll('.checks input').forEach(function(el){
-    el.checked = !!state[el.id];
+    if (el.id in state) el.checked = !!state[el.id];
     el.addEventListener('change', function(){
       state[el.id] = el.checked;
       try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
