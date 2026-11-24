@@ -199,7 +199,7 @@ footer ul{margin:0;padding-left:20px}
     </div>
     <div class="status" aria-label="目前進度">
       <span class="pill p-ok">機票：已訂（長榮 BR156／BR155）</span>
-      <span class="pill p-todo">住宿：未訂</span>
+      <span class="pill p-ok">住宿：已訂 ONU STAY 益善</span>
       <span class="pill p-wait">演唱會：場次待定（1/2 或 1/3）</span>
     </div>
     <div class="cd" id="cd" aria-live="polite"></div>
@@ -227,7 +227,8 @@ footer ul{margin:0;padding-left:20px}
       <ul class="checks">
         <li><input type="checkbox" id="c-flight2" checked><label for="c-flight2">機票已訂：長榮 BR156（1/2 松山→金浦）／BR155（1/6 金浦→松山）</label></li>
         <li><input type="checkbox" id="c-seat"><label for="c-seat">長榮線上選位、確認托運行李額度（經濟艙一般為 23kg）</label></li>
-        <li><input type="checkbox" id="c-hotel"><label for="c-hotel">訂 1/2–1/6 可免費取消的房間（見「住宿」：Yaja 2,939、Venue G 3,298、納法爾 3,421、ONU STAY 約 3,467）</label></li>
+        <li><input type="checkbox" id="c-hotel2" checked><label for="c-hotel2">住宿已訂：ONU STAY 益善 1/2–1/6（可免費取消到 12/19）</label></li>
+        <li><input type="checkbox" id="c-hotelwatch"><label for="c-hotelwatch">12/19 前持續比價：有更便宜或更好的再改訂<span class="due">取消期限 12/19</span></label></li>
         <li><input type="checkbox" id="c-flash"><label for="c-flash">Agoda 11/27 單日閃購再查一次，有更便宜就改訂<span class="due">11/27</span></label></li>
       </ul>
       <h3>證件與上網</h3>
@@ -396,7 +397,7 @@ footer ul{margin:0;padding-left:20px}
           <li class="red key"><span class="t">18:00</span><span class="w">한로로 演唱會（若選 1/2 場）</span></li>
           <li class="mv"><span class="t">~21:00</span><span class="w">接駁車＋AREX 回首爾，約 22:00–22:30 到飯店</span></li>
         </ol>
-        <p class="stay">住宿 <b>待訂</b>（1/2–1/6，見「住宿」）</p>
+        <p class="stay">住宿 <b>ONU STAY 益善</b>（敦化門路 61，鐘路3街站約 400 m）；沒電梯，行李要提上樓（店主會幫忙）</p>
       </div>
     </section>
 
@@ -443,17 +444,23 @@ footer ul{margin:0;padding-left:20px}
   </main>
 
   <section class="block" id="hotel">
-    <h2>住宿候選</h2>
-    <p class="sub">Agoda，1/2 入住 4 晚、1 位大人，2026/11/20 查詢。含稅價＝不含稅價 × 各飯店結帳頁稅率（ONU STAY 稅率未取得，以 10% 估）。預算每晚 NT$3,000。</p>
+    <h2>住宿</h2>
+    <div class="callout glass"><b>已訂：ONU STAY 益善（ONU STAY Ikseon）</b>　1/2–1/6 共 4 晚，三人房－禁菸（20㎡，1 大床＋1 單人床），每晚含稅約 3,467、4 晚約 13,870（稅率以 10% 估）。Agoda 9.4（1,764 則）、Google ★5.0。地址：首爾鐘路區敦化門路 61；鐘路3街站約 400 m、安國站約 560 m。<b>免費取消到 12/19</b>，之前會繼續比價。</div>
+    <h3>持續比價中的其他選擇</h3>
+    <p class="sub">Agoda，1/2 入住 4 晚、1 位大人，2026/11/20–11/24 查詢。含稅價＝不含稅價 × 各飯店結帳頁稅率（ONU STAY 稅率未取得，以 10% 估）。預算每晚 NT$3,000。</p>
     <div class="tbl glass"><table>
       <thead><tr><th>飯店</th><th>位置</th><th>Agoda</th><th>Google</th><th>每晚含稅</th><th>4 晚</th><th>重點</th></tr></thead>
       <tbody>
-        <tr class="hl"><td><b>Hotel Yaja Jongno</b></td><td>鐘路3街站</td><td class="n">8.3（711）</td><td class="n">—</td><td class="n">2,939</td><td class="n">11,756</td><td>唯一在預算內</td></tr>
-        <tr><td>SimpleStay Hotel</td><td>鐘路3街站</td><td class="n">8.5（277）</td><td class="n">—</td><td class="n">3,026</td><td class="n">12,104</td><td>評價數較少</td></tr>
-        <tr><td><b>Venue G 飯店</b></td><td>清溪川／鐘路3街</td><td class="n">8.3（18,391）</td><td class="n">★3.9</td><td class="n">3,298</td><td class="n">13,190</td><td>有電梯、24h 櫃台；設施較舊</td></tr>
-        <tr><td><b>納法爾 Hotel Nafore</b></td><td>清溪川／鐘路3街</td><td class="n">8.3（3,367）</td><td class="n">★4.2</td><td class="n">3,421</td><td class="n">13,684</td><td>房間大、地暖；隔音普通</td></tr>
-        <tr><td><b>ONU STAY 益善</b></td><td>益善洞</td><td class="n">9.4（1,764）</td><td class="n">★5.0</td><td class="n">約 3,467</td><td class="n">約 13,870</td><td>最乾淨；沒電梯，只剩三人房</td></tr>
-        <tr><td>Hotel Firststay Hongdae</td><td>新村</td><td class="n">9.2（2,173）</td><td class="n">—</td><td class="n">3,905</td><td class="n">15,620</td><td>你追蹤中的那間</td></tr>
+        <tr class="hl"><td><b>ONU STAY 益善（已訂）</b></td><td>益善洞</td><td class="n">9.4（1,764）</td><td class="n">★5.0</td><td class="n">約 3,467</td><td class="n">約 13,870</td><td>比較基準</td></tr>
+        <tr><td><b>梨大首爾大旅館</b></td><td>梨大站 210 m</td><td class="n">9.1（1,990）</td><td class="n">★4.3</td><td class="n">約 2,750</td><td class="n">約 11,000</td><td>更便宜、分數也高；房間 10㎡、離鐘路遠</td></tr>
+        <tr><td>Hotel Yaja Jongno</td><td>鐘路3街站</td><td class="n">8.3（711）</td><td class="n">—</td><td class="n">2,939</td><td class="n">11,756</td><td>便宜 528／晚，評分低一截</td></tr>
+        <tr><td>SimpleStay Hotel</td><td>鐘路3街站</td><td class="n">8.5（277）</td><td class="n">★4.7</td><td class="n">3,026</td><td class="n">12,104</td><td>Google 說含早餐</td></tr>
+        <tr><td>Venue G 飯店</td><td>清溪川</td><td class="n">8.3（18,391）</td><td class="n">★3.9</td><td class="n">3,298</td><td class="n">13,190</td><td>有電梯；設施舊</td></tr>
+        <tr><td>納法爾 Hotel Nafore</td><td>清溪川</td><td class="n">8.3（3,367）</td><td class="n">★4.2</td><td class="n">3,421</td><td class="n">13,684</td><td>房間大、地暖</td></tr>
+        <tr><td>Top Hotel &amp; Residence</td><td>仁寺洞</td><td class="n">8.7（2,363）</td><td class="n">★4.3</td><td class="n">3,542</td><td class="n">14,168</td><td>雙床房</td></tr>
+        <tr><td>Grid Inn 格子旅館</td><td>鐘路3街站 110 m</td><td class="n">8.8（4,341）</td><td class="n">★4.5</td><td class="n">3,864</td><td class="n">15,456</td><td>離地鐵最近</td></tr>
+        <tr><td>Dormy Inn EXPRESS 仁寺洞</td><td>仁寺洞</td><td class="n">8.9（5,437）</td><td class="n">★4.3</td><td class="n">4,214</td><td class="n">16,856</td><td>單人房</td></tr>
+        <tr><td>The Prima Hotel Jongno</td><td>仁寺洞</td><td class="n">9.0（5,269）</td><td class="n">★4.6</td><td class="n">4,922</td><td class="n">19,688</td><td>評價好但貴</td></tr>
       </tbody></table></div>
     <p class="sub">全部都有可免費取消的方案。比較檔在 repo 的 <span class="mono">hotel-search/agoda_stay_2027-01-02_4.html</span>。</p>
   </section>
