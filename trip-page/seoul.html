@@ -92,6 +92,14 @@ nav.days a:active{transform:translate(2px,2px)}
 .checks input:checked + label{color:var(--muted);text-decoration:line-through 2px var(--marker)}
 .due{font-family:var(--f-num);font-size:13px;color:var(--red);border:1.5px dashed var(--red);border-radius:8px;padding:0 6px;margin-left:6px;white-space:nowrap}
 
+/* packing list */
+.pack{padding:18px;display:flex;flex-direction:column;gap:10px}
+.pack h3{margin-top:4px;text-decoration:underline wavy var(--blue);text-underline-offset:5px}
+.pack .checks input:checked::after{border-color:var(--blue)}
+.packgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px}
+@media (max-width:640px){.packgrid{grid-template-columns:1fr}}
+.packgrid>div{min-width:0;display:flex;flex-direction:column;gap:6px}
+
 /* flights = 登機證 */
 .fl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
 .flc{padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
@@ -230,6 +238,62 @@ footer ul{margin:0;padding-left:20px}
         <li><input type="checkbox" id="c-tmoney"><label for="c-tmoney">準備 T-money 交通卡並加值（散場時售票機會排很長）</label></li>
         <li><input type="checkbox" id="c-sim"><label for="c-sim">eSIM 或網卡（取票要打開購票明細，手機不能斷網）</label></li>
       </ul>
+    </div>
+  </section>
+
+  <section class="block" id="pack">
+    <h2>行李清單</h2>
+    <p class="sub">依 1 月初首爾（平均高溫 1.6°C、低溫 −5.8°C）和演唱會整理。勾選只存在你這台裝置。</p>
+    <div class="glass pack">
+      <div class="packgrid">
+        <div>
+          <h3>證件與票券</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-passport"><label for="p-passport"><b>護照正本</b>（演唱會取票必備，影本、照片都不收）</label></li>
+            <li><input type="checkbox" id="p-ticket"><label for="p-ticket">演唱會購票明細：確認 App／網頁開得出來（不收截圖）</label></li>
+            <li><input type="checkbox" id="p-flight"><label for="p-flight">機票訂位確認、住宿訂房確認</label></li>
+            <li><input type="checkbox" id="p-card"><label for="p-card">信用卡（海外回饋卡，取消時會退海外手續費的那張）＋少量韓元現金</label></li>
+            <li><input type="checkbox" id="p-tmoney"><label for="p-tmoney">T-money 交通卡（沒有的話到便利商店買）</label></li>
+          </ul>
+          <h3>電子用品</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-phone"><label for="p-phone">手機、充電線</label></li>
+            <li><input type="checkbox" id="p-power"><label for="p-power"><b>行動電源</b>（低溫很耗電；要放隨身行李，不能托運）</label></li>
+            <li><input type="checkbox" id="p-plug"><label for="p-plug">轉接頭：韓國 220V、雙圓腳（C／F 型）</label></li>
+            <li><input type="checkbox" id="p-esim"><label for="p-esim">eSIM 或網卡（取票、查路線都要上網）</label></li>
+          </ul>
+          <h3>保養與藥品</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-lotion"><label for="p-lotion">乳液、護唇膏、護手霜（又乾又冷）</label></li>
+            <li><input type="checkbox" id="p-med"><label for="p-med">常備藥（感冒、腸胃、止痛）、口罩</label></li>
+          </ul>
+        </div>
+        <div>
+          <h3>衣物</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-heat"><label for="p-heat">發熱衣、發熱褲（上下都要）</label></li>
+            <li><input type="checkbox" id="p-mid"><label for="p-mid">毛衣或刷毛中層（室內暖氣強，要好穿脫）</label></li>
+            <li><input type="checkbox" id="p-down"><label for="p-down"><b>長版羽絨外套</b>（過膝最好）</label></li>
+            <li><input type="checkbox" id="p-acc"><label for="p-acc">毛帽、圍巾或脖圍、可滑手機的手套</label></li>
+            <li><input type="checkbox" id="p-socks"><label for="p-socks">厚襪</label></li>
+            <li><input type="checkbox" id="p-shoes"><label for="p-shoes"><b>防水、止滑的短靴或運動鞋</b>（不需要雪靴）</label></li>
+            <li><input type="checkbox" id="p-pj"><label for="p-pj">睡衣、換洗衣物</label></li>
+          </ul>
+          <h3>演唱會當天</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-inner"><label for="p-inner">薄的內層（場內很熱，外套要能脫掉塞進包包）</label></li>
+            <li><input type="checkbox" id="p-bag"><label for="p-bag">小包包（寄物處未確認，不要帶大包）</label></li>
+            <li><input type="checkbox" id="p-warm"><label for="p-warm">暖暖包（站位在海邊戶外排隊約 2.5 小時；韓國便利商店叫「핫팩」）</label></li>
+            <li><input type="checkbox" id="p-water"><label for="p-water">有蓋瓶裝水（場內只准帶這個；不帶自拍棒、腳架、大砲鏡頭）</label></li>
+          </ul>
+          <h3>其他</h3>
+          <ul class="checks">
+            <li><input type="checkbox" id="p-cramp"><label for="p-cramp">簡易冰爪（南怡島如果有積雪；當地 Daiso、便利商店可買，叫「아이젠」）</label></li>
+            <li><input type="checkbox" id="p-eco"><label for="p-eco">折疊購物袋</label></li>
+            <li><input type="checkbox" id="p-luggage"><label for="p-luggage">選酷航的話：確認已加購托運行李</label></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
