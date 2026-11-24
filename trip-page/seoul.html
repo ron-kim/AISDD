@@ -193,12 +193,12 @@ footer ul{margin:0;padding-left:20px}
     <div class="toprow"><div class="eyebrow">SEOUL · INCHEON · 남이섬</div><button type="button" class="themebtn" id="themebtn" aria-pressed="false"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg><span id="themelbl">深色</span></button></div>
     <h1>首爾跨年行程</h1>
     <div class="meta">
-      <span>日期 <b class="mono">2027/1/1（五）– 1/6（三）</b>（候選）</span>
+      <span>日期 <b class="mono">2027/1/2（六）– 1/6（三）</b></span>
       <span>人數 <b>1 人</b></span>
       <span>重點 <b>한로로 5th 단독콘서트〔물음표〕</b>・NAVER Arena at INSPIRE</span>
     </div>
     <div class="status" aria-label="目前進度">
-      <span class="pill p-todo">機票：未訂</span>
+      <span class="pill p-ok">機票：長榮 BR156／BR155</span>
       <span class="pill p-todo">住宿：未訂</span>
       <span class="pill p-wait">演唱會：場次待定（1/2 或 1/3）</span>
     </div>
@@ -206,12 +206,11 @@ footer ul{margin:0;padding-left:20px}
   </header>
 
   <nav class="days" aria-label="選擇日期">
-    <a href="#d1"><small>DAY 1・週五</small><span class="mono">1/1</span></a>
-    <a href="#d2" class="concert"><small>DAY 2・週六</small><span class="mono">1/2</span></a>
-    <a href="#d3" class="concert"><small>DAY 3・週日</small><span class="mono">1/3</span></a>
-    <a href="#d4"><small>DAY 4・週一</small><span class="mono">1/4</span></a>
-    <a href="#d5"><small>DAY 5・週二</small><span class="mono">1/5</span></a>
-    <a href="#d6"><small>DAY 6・週三</small><span class="mono">1/6</span></a>
+    <a href="#d1" class="concert"><small>DAY 1・週六</small><span class="mono">1/2</span></a>
+    <a href="#d2" class="concert"><small>DAY 2・週日</small><span class="mono">1/3</span></a>
+    <a href="#d3"><small>DAY 3・週一</small><span class="mono">1/4</span></a>
+    <a href="#d4"><small>DAY 4・週二</small><span class="mono">1/5</span></a>
+    <a href="#d5"><small>DAY 5・週三</small><span class="mono">1/6</span></a>
   </nav>
 
   <section class="block" id="todo">
@@ -226,9 +225,9 @@ footer ul{margin:0;padding-left:20px}
       </ul>
       <h3>機票與住宿</h3>
       <ul class="checks">
-        <li><input type="checkbox" id="c-flight"><label for="c-flight">訂機票：酷航 1/1–1/6（10,354）或韓亞 1/1–1/6（10,790，含行李）</label></li>
-        <li><input type="checkbox" id="c-bag"><label for="c-bag">選酷航的話：加購托運行李（排行用估價 NT$745／段，官網未確認）</label></li>
-        <li><input type="checkbox" id="c-hotel"><label for="c-hotel">訂可免費取消的房間（SimpleStay／Yaja 約 3,125 或 First Stay 4,214）</label></li>
+        <li><input type="checkbox" id="c-flight2" checked><label for="c-flight2">機票：長榮 BR156（1/2 松山→金浦）／BR155（1/6 金浦→松山）</label></li>
+        <li><input type="checkbox" id="c-seat"><label for="c-seat">長榮線上選位、確認托運行李額度（經濟艙一般為 23kg）</label></li>
+        <li><input type="checkbox" id="c-hotel"><label for="c-hotel">訂 1/2–1/6 可免費取消的房間（見「住宿」：Yaja 2,939、Venue G 3,298、納法爾 3,421、ONU STAY 約 3,467）</label></li>
         <li><input type="checkbox" id="c-flash"><label for="c-flash">Agoda 11/27 單日閃購再查一次，有更便宜就改訂<span class="due">11/27</span></label></li>
       </ul>
       <h3>證件與上網</h3>
@@ -290,7 +289,6 @@ footer ul{margin:0;padding-left:20px}
           <ul class="checks">
             <li><input type="checkbox" id="p-cramp"><label for="p-cramp">簡易冰爪（南怡島如果有積雪；當地 Daiso、便利商店可買，叫「아이젠」）</label></li>
             <li><input type="checkbox" id="p-eco"><label for="p-eco">折疊購物袋</label></li>
-            <li><input type="checkbox" id="p-luggage"><label for="p-luggage">選酷航的話：確認已加購托運行李</label></li>
           </ul>
         </div>
       </div>
@@ -298,23 +296,21 @@ footer ul{margin:0;padding-left:20px}
   </section>
 
   <section class="block" id="flight">
-    <h2>航班候選</h2>
-    <p class="sub">台北桃園 ⇄ 仁川直飛，總價含托運行李與機場⇄首爾站交通（AREX 一般列車 ₩4,750）。價格是 2026/11/16 20:13 即時查價結果，11/17 早上更新仍相同。</p>
+    <h2>航班</h2>
+    <p class="sub">長榮航空，台北松山 ⇄ 首爾金浦直飛。兩座都是市區機場，比桃園⇄仁川近很多。</p>
     <div class="fl-grid">
       <div class="flc glass pick">
-        <div class="flh"><span class="tag">最便宜</span><b>酷航 Scoot</b><span class="price">NT$10,354</span></div>
-        <div class="leg"><div><div class="lt">18:10</div><div class="la">1/1 TPE 桃園</div></div><div class="lm"><svg aria-hidden="true"><use href="#i-plane"/></svg><span class="mono">2h30m</span></div><div class="r"><div class="lt">21:40</div><div class="la">ICN 仁川</div></div></div>
-        <div class="leg"><div><div class="lt">22:55</div><div class="la">1/6 ICN 仁川</div></div><div class="lm"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-plane"/></svg><span class="mono">2h40m</span></div><div class="r"><div class="lt">00:35</div><div class="la">1/7 TPE 桃園</div></div></div>
-        <div class="fln">來回票價 <b class="mono">8,630</b>＋行李估 <b class="mono">1,490</b>＋交通 <b class="mono">234</b>。21:40 落地，當晚搭得到 AREX 進市區。價格這週在 8,630 和 9,041 間跳動。</div>
+        <div class="flh"><span class="tag">去程</span><span class="mono">1/2（六）</span><b>長榮 BR156</b></div>
+        <div class="leg"><div><div class="lt">09:20</div><div class="la">TSA 台北松山</div></div><div class="lm"><svg aria-hidden="true"><use href="#i-plane"/></svg><span class="mono">2h30m</span></div><div class="r"><div class="lt">12:50</div><div class="la">GMP 首爾金浦</div></div></div>
+        <div class="fln">落地後入境約 40 分鐘。金浦機場站有 AREX、地鐵 5／9 號線，到首爾站約 25 分鐘、₩1,650。</div>
       </div>
       <div class="flc glass">
-        <div class="flh"><span class="tag alt">含行李</span><b>韓亞航空 Asiana</b><span class="price">NT$10,790</span></div>
-        <div class="leg"><div><div class="lt">17:05</div><div class="la">1/1 TPE 桃園</div></div><div class="lm"><svg aria-hidden="true"><use href="#i-plane"/></svg><span class="mono">2h25m</span></div><div class="r"><div class="lt">20:30</div><div class="la">ICN 仁川</div></div></div>
-        <div class="leg"><div><div class="lt">13:50</div><div class="la">1/6 ICN 仁川</div></div><div class="lm"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-plane"/></svg><span class="mono">2h05m</span></div><div class="r"><div class="lt">15:55</div><div class="la">TPE 桃園</div></div></div>
-        <div class="fln">來回票價 <b class="mono">10,556</b>（含 23kg 托運）＋交通 <b class="mono">234</b>。比酷航貴 436，但落地早、白天回程。1/1–1/5 已漲到 10,996。</div>
+        <div class="flh"><span class="tag alt">回程</span><span class="mono">1/6（三）</span><b>長榮 BR155</b></div>
+        <div class="leg"><div><div class="lt">20:15</div><div class="la">GMP 首爾金浦</div></div><div class="lm"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-plane"/></svg><span class="mono">2h45m</span></div><div class="r"><div class="lt">22:00</div><div class="la">TSA 台北松山</div></div></div>
+        <div class="fln">起飛前 2 小時到機場：<b>約 17:40 從市區出發</b>。1/6 白天還能玩大半天。</div>
       </div>
     </div>
-    <p class="sub">飛行時間依時差（韓國快 1 小時）換算；航班號以訂位確認信為準。完整排行在 repo 的 <span class="mono">flight-search/rank_all.png</span>。</p>
+    <p class="sub">時刻為 2026/11/20 Google Flights 查詢結果（當時來回 NT$12,624，含 23kg 托運）。實際時刻與航廈以長榮訂位確認信為準。</p>
   </section>
 
   <section class="block" id="concert">
@@ -324,8 +320,8 @@ footer ul{margin:0;padding-left:20px}
       <div class="track glass">
         <h3>1/2（六）場 <small>18:00 開演</small></h3>
         <ol class="tt">
-          <li class="mv"><span class="t">13:00</span><span class="w">首爾站搭 AREX 一般列車 → 空港貨物廳舍站</span></li>
-          <li class="key"><span class="t">14:00</span><span class="w">售票處開放，現場取票<span class="note">護照正本＋購票明細</span></span></li>
+          <li class="mv"><span class="t">13:30</span><span class="w">金浦入境後直接搭 AREX → 空港貨物廳舍站（約 35 分），2 號出口轉接駁車<span class="note">行李先寄放（金浦機場或飯店），或確認場館能不能寄物</span></span></li>
+          <li class="key"><span class="t">14:30</span><span class="w">到 INSPIRE，現場取票（售票處 14:00 開）<span class="note">護照正本＋購票明細</span></span></li>
           <li><span class="t">15:30</span><span class="w">站位依號碼排隊</span></li>
           <li><span class="t">16:30</span><span class="w">開始入場（對號座也是）</span></li>
           <li class="red key"><span class="t">18:00</span><span class="w">開演</span></li>
@@ -390,67 +386,57 @@ footer ul{margin:0;padding-left:20px}
     <h2>每日行程（草稿）</h2>
 
     <section class="day glass" id="d1">
-      <div class="dayhead"><div class="when"><span class="date">DAY 1・2027/1/1（五）</span><h2>抵達首爾</h2></div><div class="seal dim"><b>ICN</b>抵達</div></div>
+      <div class="dayhead"><div class="when"><span class="date">DAY 1・2027/1/2（六）</span><h2>抵達首爾＋演唱會（若選 1/2 場）</h2></div><div class="seal red"><b>18:00</b>演唱會</div></div>
       <div class="daybody">
-        <div class="wx"><span>首爾 1 月平年</span><b class="mono">高 1.6°C／低 −5.8°C</b><span>夜間抵達請穿厚外套</span></div>
+        <div class="wx"><span>首爾 1 月平年</span><b class="mono">高 1.6°C／低 −5.8°C</b><span>INSPIRE 在海邊，排隊時最冷</span></div>
         <ol class="tt">
-          <li class="key"><span class="t">18:10</span><span class="w">桃園起飛（酷航）<span class="note">選韓亞則 17:05 起飛、20:30 落地</span></span></li>
-          <li><span class="t">21:40</span><span class="w">抵達仁川，入境約 60 分鐘</span></li>
-          <li class="mv"><span class="t">22:40</span><span class="w">AREX 一般列車 → 首爾站，約 60 分鐘、₩4,750<span class="note">往首爾末班約 23:30，入境慢的話要留意</span></span></li>
-          <li><span class="t">23:40</span><span class="w">到飯店 check-in</span></li>
+          <li class="key"><span class="t">09:20</span><span class="w">台北松山起飛（長榮 BR156）</span></li>
+          <li><span class="t">12:50</span><span class="w">抵達金浦，入境約 40 分鐘</span></li>
+          <li class="mv"><span class="t">13:30</span><span class="w">選 1/2 場：AREX 直接到空港貨物廳舍站，轉接駁車去 INSPIRE<span class="note">選 1/3 場：AREX 或地鐵進市區（約 25 分），先 check-in</span></span></li>
+          <li class="red key"><span class="t">18:00</span><span class="w">한로로 演唱會（若選 1/2 場）</span></li>
+          <li class="mv"><span class="t">~21:00</span><span class="w">接駁車＋AREX 回首爾，約 22:00–22:30 到飯店</span></li>
         </ol>
-        <p class="stay">住宿 <b>待訂</b>（鐘路或新村弘大，見「住宿」）</p>
+        <p class="stay">住宿 <b>待訂</b>（1/2–1/6，見「住宿」）</p>
       </div>
     </section>
 
     <section class="day glass" id="d2">
-      <div class="dayhead"><div class="when"><span class="date">DAY 2・2027/1/2（六）</span><h2>演唱會（若選 1/2 場）</h2></div><div class="seal red"><b>18:00</b>演唱會</div></div>
+      <div class="dayhead"><div class="when"><span class="date">DAY 2・2027/1/3（日）</span><h2>演唱會（若選 1/3 場）</h2></div><div class="seal red"><b>17:00</b>演唱會</div></div>
       <div class="daybody">
         <ol class="tt">
           <li class="tbd"><span class="t">上午</span><span class="w">市區自由活動（待定）</span></li>
-          <li class="mv"><span class="t">13:00</span><span class="w">出發去 INSPIRE（見「演唱會」時間表）</span></li>
-          <li class="red key"><span class="t">18:00</span><span class="w">한로로 演唱會</span></li>
-          <li class="mv"><span class="t">~21:00</span><span class="w">接駁車＋AREX 回首爾，或住仁川永宗島</span></li>
+          <li class="mv"><span class="t">12:00</span><span class="w">首爾站搭 AREX → 空港貨物廳舍站，轉接駁車</span></li>
+          <li class="red key"><span class="t">17:00</span><span class="w">한로로 演唱會（若選 1/3 場）</span></li>
+          <li class="mv"><span class="t">~20:00</span><span class="w">回首爾</span></li>
         </ol>
-        <p class="stay">若選 1/3 場，這天改成市區行程。</p>
+        <p class="stay">若選 1/2 場，這天改成市區行程。</p>
       </div>
     </section>
 
     <section class="day glass" id="d3">
-      <div class="dayhead"><div class="when"><span class="date">DAY 3・2027/1/3（日）</span><h2>演唱會（若選 1/3 場）</h2></div><div class="seal red"><b>17:00</b>演唱會</div></div>
-      <div class="daybody">
-        <ol class="tt">
-          <li class="tbd"><span class="t">上午</span><span class="w">市區自由活動（待定）</span></li>
-          <li class="mv"><span class="t">12:00</span><span class="w">出發去 INSPIRE</span></li>
-          <li class="red key"><span class="t">17:00</span><span class="w">한로로 演唱會</span></li>
-          <li class="mv"><span class="t">~20:00</span><span class="w">回首爾</span></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="day glass" id="d4">
-      <div class="dayhead"><div class="when"><span class="date">DAY 4・2027/1/4（一）</span><h2>南怡島（建議平日去）</h2></div><div class="seal jade"><b>平日</b>人少</div></div>
+      <div class="dayhead"><div class="when"><span class="date">DAY 3・2027/1/4（一）</span><h2>南怡島（建議平日去）</h2></div><div class="seal jade"><b>平日</b>人少</div></div>
       <div class="daybody">
         <ol class="tt">
           <li class="tbd"><span class="t">全天</span><span class="w">南怡島一日遊（交通與票待查）</span></li>
         </ol>
-        <p class="sub">1/2–1/3 在南怡島遇到下雪的機率低：過去 26 年只有 23% 有降雪紀錄，近 10 年 0 次（NOAA 春川測站）。積雪不保證，雪景最穩定是 1 月中下旬。1/4、1/5 是平日，比週末人少。</p>
+        <p class="sub">1 月初南怡島遇到下雪的機率低：過去 26 年 1/2–1/3 只有 23% 有降雪紀錄，近 10 年 0 次（NOAA 春川測站）。積雪不保證，雪景最穩定是 1 月中下旬。</p>
       </div>
     </section>
 
-    <section class="day glass" id="d5">
-      <div class="dayhead"><div class="when"><span class="date">DAY 5・2027/1/5（二）</span><h2>首爾市區</h2></div><div class="seal dim"><b>自由</b>待定</div></div>
+    <section class="day glass" id="d4">
+      <div class="dayhead"><div class="when"><span class="date">DAY 4・2027/1/5（二）</span><h2>首爾市區</h2></div><div class="seal dim"><b>自由</b>待定</div></div>
       <div class="daybody">
         <ol class="tt"><li class="tbd"><span class="t">白天</span><span class="w">待安排（南怡島備用日）</span></li><li><span class="t">18:00</span><span class="w">清溪川首爾燈節（免費，開到 23:00，見「活動」）</span></li></ol>
       </div>
     </section>
 
-    <section class="day glass" id="d6">
-      <div class="dayhead"><div class="when"><span class="date">DAY 6・2027/1/6（三）</span><h2>回程</h2></div><div class="seal dim"><b>TPE</b>回程</div></div>
+    <section class="day glass" id="d5">
+      <div class="dayhead"><div class="when"><span class="date">DAY 5・2027/1/6（三）</span><h2>回程</h2></div><div class="seal dim"><b>TSA</b>回程</div></div>
       <div class="daybody">
         <ol class="tt">
-          <li class="mv"><span class="t">19:55</span><span class="w">離開市區（酷航 22:55 起飛：起飛前 2 小時到機場＋AREX 1 小時）<span class="note">選韓亞 13:50 起飛則 10:50 離開市區</span></span></li>
-          <li class="key"><span class="t">22:55</span><span class="w">仁川起飛，1/7 00:35 抵達桃園</span></li>
+          <li class="tbd"><span class="t">白天</span><span class="w">市區自由活動（check-out 後行李可寄飯店）</span></li>
+          <li class="mv"><span class="t">17:40</span><span class="w">取行李，AREX 或地鐵到金浦（約 25 分）</span></li>
+          <li class="key"><span class="t">20:15</span><span class="w">金浦起飛（長榮 BR155），22:00 抵達松山</span></li>
         </ol>
       </div>
     </section>
@@ -458,19 +444,18 @@ footer ul{margin:0;padding-left:20px}
 
   <section class="block" id="hotel">
     <h2>住宿候選</h2>
-    <p class="sub">Agoda，1/1 入住 5 晚、1 位大人，2026/11/16 Mega Sale 期間查詢。含稅價＝不含稅價 × 各飯店結帳頁稅率。預算每晚 NT$3,000，目前沒有一間在預算內。</p>
+    <p class="sub">Agoda，1/2 入住 4 晚、1 位大人，2026/11/20 查詢。含稅價＝不含稅價 × 各飯店結帳頁稅率（ONU STAY 稅率未取得，以 10% 估）。預算每晚 NT$3,000。</p>
     <div class="tbl glass"><table>
-      <thead><tr><th>飯店</th><th>位置</th><th>Agoda</th><th>每晚含稅</th><th>5 晚</th><th>可免費取消</th></tr></thead>
+      <thead><tr><th>飯店</th><th>位置</th><th>Agoda</th><th>Google</th><th>每晚含稅</th><th>4 晚</th><th>重點</th></tr></thead>
       <tbody>
-        <tr class="hl"><td><b>SimpleStay Hotel</b></td><td>鐘路3街站</td><td class="n">8.5（273）</td><td class="n">3,125</td><td class="n">15,625</td><td>同價</td></tr>
-        <tr class="hl"><td><b>Hotel Yaja Jongno</b></td><td>鐘路3街站</td><td class="n">8.3（700）</td><td class="n">3,126</td><td class="n">15,630</td><td>同價</td></tr>
-        <tr><td>H Avenue 梨大新村</td><td>新村</td><td class="n">7.9（9,157）</td><td class="n">3,804</td><td class="n">19,020</td><td class="n">4,475</td></tr>
-        <tr><td><b>Hotel Firststay Hongdae</b></td><td>新村</td><td class="n">9.2（2,144）</td><td class="n">4,214</td><td class="n">21,070</td><td>同價</td></tr>
-        <tr><td>新村 Urban Hotel</td><td>新村站</td><td class="n">8.1（1,020）</td><td class="n">4,266</td><td class="n">21,330</td><td>同價</td></tr>
-        <tr><td>仁寺洞 N285</td><td>仁寺洞</td><td class="n">8.7（7,313）</td><td class="n">4,400</td><td class="n">22,000</td><td class="n">5,082</td></tr>
-        <tr><td>宜必思大使仁寺洞</td><td>仁寺洞</td><td class="n">8.7（3,181）</td><td class="n">4,734</td><td class="n">23,670</td><td class="n">5,300</td></tr>
+        <tr class="hl"><td><b>Hotel Yaja Jongno</b></td><td>鐘路3街站</td><td class="n">8.3（711）</td><td class="n">—</td><td class="n">2,939</td><td class="n">11,756</td><td>唯一在預算內</td></tr>
+        <tr><td>SimpleStay Hotel</td><td>鐘路3街站</td><td class="n">8.5（277）</td><td class="n">—</td><td class="n">3,026</td><td class="n">12,104</td><td>評價數較少</td></tr>
+        <tr><td><b>Venue G 飯店</b></td><td>清溪川／鐘路3街</td><td class="n">8.3（18,391）</td><td class="n">★3.9</td><td class="n">3,298</td><td class="n">13,190</td><td>有電梯、24h 櫃台；設施較舊</td></tr>
+        <tr><td><b>納法爾 Hotel Nafore</b></td><td>清溪川／鐘路3街</td><td class="n">8.3（3,367）</td><td class="n">★4.2</td><td class="n">3,421</td><td class="n">13,684</td><td>房間大、地暖；隔音普通</td></tr>
+        <tr><td><b>ONU STAY 益善</b></td><td>益善洞</td><td class="n">9.4（1,764）</td><td class="n">★5.0</td><td class="n">約 3,467</td><td class="n">約 13,870</td><td>最乾淨；沒電梯，只剩三人房</td></tr>
+        <tr><td>Hotel Firststay Hongdae</td><td>新村</td><td class="n">9.2（2,173）</td><td class="n">—</td><td class="n">3,905</td><td class="n">15,620</td><td>你追蹤中的那間</td></tr>
       </tbody></table></div>
-    <p class="sub">完整 23 間的比較在 repo 的 <span class="mono">hotel-search/agoda_stay_2027-01-01_5.html</span>。演唱會當晚想住仁川的話，永宗島飯店清單在 <span class="mono">hotel-search/agoda_incheon.html</span>。</p>
+    <p class="sub">全部都有可免費取消的方案。比較檔在 repo 的 <span class="mono">hotel-search/agoda_stay_2027-01-02_4.html</span>。</p>
   </section>
 
   <section class="block" id="weather">
@@ -489,7 +474,7 @@ footer ul{margin:0;padding-left:20px}
       <li>機票：Google Flights，1 成人經濟艙直飛；排行與即時查價紀錄在 repo 的 <span class="mono">flight-search/</span></li>
       <li>演唱會：<a href="https://nol.yanolja.com/ticket/products/26015537" target="_blank" rel="noopener">NOL Ticket</a>、<a href="https://ticket.melon.com/performance/index.htm?prodId=214165" target="_blank" rel="noopener">Melon Ticket</a> 公告（2026/11/12 讀取）</li>
       <li>INSPIRE 交通：@hanroro.mag Instagram 2026/11/17 貼文（接駁時刻為一般營運時刻）</li>
-      <li>住宿：Agoda，2026/11/16 查詢</li>
+      <li>住宿：Agoda，2026/11/20 查詢；Google 星等 2026/11/20</li>
       <li>天氣：首爾 1 月平年值；南怡島降雪為 NOAA GHCN 春川測站（KSM00047101）統計</li>
     </ul>
   </footer>
@@ -516,14 +501,14 @@ footer ul{margin:0;padding-left:20px}
   if (mq && mq.addEventListener) mq.addEventListener('change', sync);
   sync();
 
-  // 倒數到 2027/1/1 18:10（台灣時間，UTC+8）
-  var dep = Date.UTC(2027,0,1,10,10);
+  // 倒數到 2027/1/2 09:20（台灣時間，UTC+8）
+  var dep = Date.UTC(2027,0,2,1,20);
   var cd = document.getElementById('cd');
   function tick(){
     var ms = dep - Date.now();
     if (ms <= 0){ cd.textContent = '出發日到了，一路順風'; return; }
     var d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5);
-    cd.innerHTML = '<span class="cdb glass"><b>'+d+'</b><small>天</small></span><span class="cdb glass"><b>'+h+'</b><small>小時</small></span><span class="sub">距離出發（酷航 1/1 18:10）</span>';
+    cd.innerHTML = '<span class="cdb glass"><b>'+d+'</b><small>天</small></span><span class="cdb glass"><b>'+h+'</b><small>小時</small></span><span class="sub">距離出發（長榮 BR156 1/2 09:20）</span>';
   }
   tick(); setInterval(tick, 60000);
 
@@ -551,7 +536,7 @@ footer ul{margin:0;padding-left:20px}
         else { mark(dayLinks, ''); mark(tabLinks, id); }
       });
     }, {rootMargin:'-40% 0px -55% 0px'});
-    ['todo','flight','concert','hotel','d1','d2','d3','d4','d5','d6'].forEach(function(id){ var el=document.getElementById(id); if (el) io.observe(el); });
+    ['todo','flight','concert','hotel','d1','d2','d3','d4','d5'].forEach(function(id){ var el=document.getElementById(id); if (el) io.observe(el); });
   }
 })();
 </script>
