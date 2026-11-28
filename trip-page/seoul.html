@@ -229,6 +229,8 @@ footer ul{margin:0;padding-left:20px}
 .maplist .no{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font:700 12px/1 var(--f-num)}
 .maplist .dt{flex:none;color:var(--muted);font-size:14px;font-family:var(--f-num);min-width:6.5em}
 .maplist .nm{min-width:0}
+.mcats{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}.mk.cand span{border-radius:7px;font-size:13px}.mk .badge{position:absolute;top:-7px;right:-9px;min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#e53935;color:#fff;font:700 10.5px/14px system-ui,sans-serif;text-align:center;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.35)}.maplist .sh{margin:8px 0 2px;font-size:14px;color:var(--muted);font-weight:700}.maplist .no.sq{border-radius:6px;font-size:13px}.maplist small{color:var(--muted);font-size:13px}
+
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--pencil);border:2px solid var(--pencil);box-shadow:3px 3px 0 var(--pencil)}
 .leaflet-popup-content{font-family:var(--f-body);font-size:15px;line-height:1.45;margin:10px 12px}
 .leaflet-popup-content b{font-size:16px}
@@ -423,7 +425,7 @@ footer ul{margin:0;padding-left:20px}
     <h2>地圖</h2>
     <div class="mapbar" role="group" aria-label="選擇日期"><button type="button" class="mchip on" data-d="all" aria-pressed="true">全部</button></div>
     <div class="mapbox glass"><div id="leaf" aria-label="行程互動地圖"></div></div>
-    <p class="mapnote">跟九州那頁一樣，只標實際要去的地點：住宿只標一次，轉乘站、回住宿和「白天自由」不標，轉乘方式寫在點的說明裡。點編號或下方清單看時間、說明和 Naver 地圖連結；可用滑鼠滾輪或雙指縮放。虛線只是依時間順序連起來，不是實際路線。1/2、1/3 的演唱會行程只會去其中一天。底圖是 OpenStreetMap 圖磚，只預先下載了行程會去的區域，拖到別處會是空白。座標取自 Naver 地圖（2026/11/28）。</p>
+    <p class="mapnote">日期按鈕顯示每天行程（含轉乘站和回住宿），右邊「🎉 活動／🛍 購物／🍴 餐廳」三個開關可分別顯示或隱藏候選地點。目前縮放下會疊在一起的圖釘合併成一個，右上角紅色數字是合併了幾個，點一下放大；放到最大仍重疊的會散開排列。點編號或下方清單看時間、說明和 Naver 地圖連結；可用滑鼠滾輪或雙指縮放。虛線只是依時間順序連起來，不是實際路線。1/2、1/3 的演唱會行程只會去其中一天。底圖是 OpenStreetMap 圖磚，只預先下載了行程會去的區域，拖到別處會是空白。座標取自 Naver 地圖（2026/11/28）。</p>
     <ol class="maplist" id="maplist"></ol>
   </section>
   <section class="block" id="events">
@@ -718,30 +720,63 @@ footer ul{margin:0;padding-left:20px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function(){
-const PTS=[{"d": "d1", "t": "12:50", "n": "金浦機場國際線（抵達）", "lat": 37.5660275, "lon": 126.800904, "id": 18952275, "note": ""}, {"d": "d1", "t": "18:00", "n": "INSPIRE Arena 演唱會", "lat": 37.4666083, "lon": 126.3905461, "id": 1997613956, "note": "選 1/2 場；AREX 到空港貨物廳舍站 2 號出口轉接駁車"}, {"d": "d1", "t": "22:00", "n": "ONU STAY 益善（住宿 1/2–1/6）", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": "選 1/3 場的話下午就先 check-in"}, {"d": "d2", "t": "17:00", "n": "INSPIRE Arena 演唱會", "lat": 37.4666083, "lon": 126.3905461, "id": 1997613956, "note": "選 1/3 場；AREX 到空港貨物廳舍站轉接駁車"}, {"d": "d3", "t": "09:19", "n": "加平站", "lat": 37.8145183, "lon": 127.5107311, "id": 13590931, "note": "ITX-青春 從清涼里來回；轉公車 10-4 到碼頭"}, {"d": "d3", "t": "09:51", "n": "南怡島碼頭", "lat": 37.803657, "lon": 127.5259961, "id": 19147670, "note": "門票 ₩19,000 含渡輪"}, {"d": "d3", "t": "10:15", "n": "南怡島", "lat": 37.7900782, "lon": 127.5262228, "id": 11491866, "note": "水杉林道、松樹林道"}, {"d": "d3", "t": "12:30", "n": "남이섬꼬꼬춘천닭갈비", "lat": 37.8059024, "lon": 127.5249167, "id": 11822730, "note": "午餐；週一 09:30–20:00"}, {"d": "d3", "t": "18:00", "n": "清溪川首爾燈節（三一橋）", "lat": 37.5681609, "lon": 126.9875799, "id": 18689313, "note": "可選"}, {"d": "d4", "t": "18:00", "n": "光化門廣場（首爾之光）", "lat": 37.5740533, "lon": 126.9768908, "id": 13349962, "note": "到 1/10；外牆秀只到 1/3"}, {"d": "d4", "t": "18:45", "n": "清溪廣場（燈節起點）", "lat": 37.569166, "lon": 126.9777119, "id": 13543936, "note": "燈節 18:00–23:00"}, {"d": "d4", "t": "19:30", "n": "三一橋（燈節東段）", "lat": 37.5681609, "lon": 126.9875799, "id": 18689313, "note": "走回住宿約 10 分"}, {"d": "d5", "t": "20:15", "n": "金浦機場國際線（BR155）", "lat": 37.5660275, "lon": 126.800904, "id": 18952275, "note": "白天自由，下午回 ONU 拿行李，鐘路3街搭 5 號線直達；18:25 前到"}, {"d": "ev", "t": "到 2/28", "n": "石村湖燈光節", "lat": 37.5095249, "lon": 127.102135, "id": 13491520, "note": "17:30–22:30"}, {"d": "ev", "t": "到 1/3", "n": "樂天城聖誕市集", "lat": 37.5125701, "lon": 127.1025624, "id": 35306752, "note": "World Park 戶外草坪"}, {"d": "ev", "t": "12 月中起", "n": "首爾廣場溜冰場", "lat": 37.5657379, "lon": 126.9779487, "id": 11796247, "note": "₩1,000（去年）"}, {"d": "ev", "t": "週一休", "n": "Mr박의돈워리（烤肉候選）", "lat": 37.5697094, "lon": 127.0323763, "id": 35451955, "note": "未達 300 則"}];
-const DAYS={"d1": ["1/2", "#d1495b"], "d2": ["1/3", "#2e6fbf"], "d3": ["1/4", "#1f8a70"], "d4": ["1/5", "#b07d00"], "d5": ["1/6", "#7b4fb3"], "ev": ["活動・候選", "#5f6b7a"]};
+const PTS=[{"d": "d1", "t": "12:50", "n": "金浦機場國際線（抵達）", "lat": 37.5660275, "lon": 126.800904, "id": 18952275, "note": ""}, {"d": "d1", "t": "13:30", "n": "空港貨物廳舍站（AREX）", "lat": 37.4590672, "lon": 126.4775041, "id": 13479777, "note": "選 1/2 場才去；2 號出口搭接駁車"}, {"d": "d1", "t": "18:00", "n": "INSPIRE Arena 演唱會", "lat": 37.4666083, "lon": 126.3905461, "id": 1997613956, "note": "選 1/2 場"}, {"d": "d1", "t": "22:00", "n": "ONU STAY 益善", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": "選 1/3 場的話下午就先 check-in"}, {"d": "d2", "t": "12:00", "n": "首爾站（AREX）", "lat": 37.5535831, "lon": 126.9694967, "id": 19537099, "note": "選 1/3 場"}, {"d": "d2", "t": "13:00", "n": "空港貨物廳舍站（AREX）", "lat": 37.4590672, "lon": 126.4775041, "id": 13479777, "note": "轉 INSPIRE 接駁車"}, {"d": "d2", "t": "17:00", "n": "INSPIRE Arena 演唱會", "lat": 37.4666083, "lon": 126.3905461, "id": 1997613956, "note": "選 1/3 場"}, {"d": "d2", "t": "20:00", "n": "ONU STAY 益善", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": ""}, {"d": "d3", "t": "08:00", "n": "ONU STAY 益善（出發）", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": ""}, {"d": "d3", "t": "08:06", "n": "鐘路3街站（1 號線）", "lat": 37.5725842, "lon": 126.9903089, "id": 20536592, "note": ""}, {"d": "d3", "t": "08:21", "n": "回基站（轉京春線）", "lat": 37.5896861, "lon": 127.0578001, "id": 13479379, "note": ""}, {"d": "d3", "t": "09:19", "n": "加平站", "lat": 37.8145183, "lon": 127.5107311, "id": 13590931, "note": "公車 10-4 09:44"}, {"d": "d3", "t": "09:51", "n": "南怡島碼頭", "lat": 37.803657, "lon": 127.5259961, "id": 19147670, "note": "門票 ₩19,000 含渡輪"}, {"d": "d3", "t": "10:15", "n": "南怡島", "lat": 37.7900782, "lon": 127.5262228, "id": 11491866, "note": "水杉林道、松樹林道"}, {"d": "d3", "t": "12:30", "n": "남이섬꼬꼬춘천닭갈비", "lat": 37.8059024, "lon": 127.5249167, "id": 11822730, "note": "午餐；週一 09:30–20:00"}, {"d": "d3", "t": "16:22", "n": "加平站（ITX-青春）", "lat": 37.8145183, "lon": 127.5107311, "id": 13590931, "note": "15:51 碼頭搭公車回來"}, {"d": "d3", "t": "17:02", "n": "清涼里站（轉 1 號線）", "lat": 37.5800103, "lon": 127.044693, "id": 11636758, "note": ""}, {"d": "d3", "t": "17:30", "n": "ONU STAY 益善", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": ""}, {"d": "d3", "t": "18:00", "n": "清溪川首爾燈節（三一橋）", "lat": 37.5681609, "lon": 126.9875799, "id": 18689313, "note": "可選"}, {"d": "d4", "t": "白天", "n": "市區自由（待安排）", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": ""}, {"d": "d4", "t": "18:00", "n": "光化門廣場（首爾之光）", "lat": 37.5740533, "lon": 126.9768908, "id": 13349962, "note": "到 1/10；外牆秀只到 1/3"}, {"d": "d4", "t": "18:45", "n": "清溪廣場（燈節起點）", "lat": 37.569166, "lon": 126.9777119, "id": 13543936, "note": "燈節 18:00–23:00"}, {"d": "d4", "t": "19:30", "n": "三一橋（燈節東段）", "lat": 37.5681609, "lon": 126.9875799, "id": 18689313, "note": "走回住宿約 10 分"}, {"d": "d5", "t": "白天", "n": "ONU STAY（check-out，寄行李）", "lat": 37.573848, "lon": 126.9910133, "id": 1304323555, "note": ""}, {"d": "d5", "t": "17:40", "n": "鐘路3街站（5 號線）", "lat": 37.5725842, "lon": 126.9903089, "id": 20536592, "note": "5 號線直達金浦"}, {"d": "d5", "t": "20:15", "n": "金浦機場國際線（BR155）", "lat": 37.5660275, "lon": 126.800904, "id": 18952275, "note": "18:25 前到"}];
+const CANDS=[{"c": "ev", "n": "石村湖燈光節", "lat": 37.5095249, "lon": 127.102135, "id": 13491520, "it": "到 2/28，每天 17:30–22:30", "note": ""}, {"c": "ev", "n": "樂天城聖誕市集", "lat": 37.5125701, "lon": 127.1025624, "id": 35306752, "it": "到 1/3，World Park 戶外草坪；入場免預約", "note": "旋轉木馬要 ₩20,000 消費收據"}, {"c": "ev", "n": "首爾廣場溜冰場", "lat": 37.5657379, "lon": 126.9779487, "id": 11796247, "it": "12 月中起；₩1,000／小時（去年資訊）", "note": "今年日期未公布"}, {"c": "shop", "n": "Daiso 종로본점", "lat": 37.5699495, "lon": 126.9874534, "id": 1110980516, "it": "頭套 니트 바라클라바、冰爪 아이젠；每天 10:00–22:00", "note": "Naver 17,046 則；離 ONU 走路近"}, {"c": "shop", "n": "Daiso 명동역점", "lat": 37.5608148, "lon": 126.9867329, "id": 1072866873, "it": "大型多樓層店，品項較齊；每天 10:00–22:00", "note": "Naver 7,881 則；明洞站"}, {"c": "food", "n": "합정광안리 숙성횟집 본점", "lat": 37.5498862, "lon": 126.9175491, "id": 1223384037, "it": "冬季大方魚生魚片；週一到週四 17:00–01:00（最後點餐 00:00），週五 17:00–02:00", "note": "Naver 4,888 則・Google ★4.2；1–2 人本店、3 人以上去隔壁 2 號店（Naver 4,366 則）；從 ONU 約 32 分（Naver，1/5 16:30）"}, {"c": "food", "n": "Mr박의돈워리", "lat": 37.5697094, "lon": 127.0323763, "id": 35451955, "it": "豬肉燒烤；週二到週六 17:00–02:00，週日 16:00–24:00，週一休", "note": "未達 300 則（Kakao ★4.0・21 則）"}, {"c": "food", "n": "힐링닭갈비 가평본점", "lat": 37.8091162, "lon": 127.5235703, "id": 19147769, "it": "1/4 午餐備選；週一 10:00–19:30", "note": "Naver 4,292 則・Google ★4.4"}, {"c": "food", "n": "아띠춘천닭갈비", "lat": 37.8089115, "lon": 127.5242888, "id": 38018471, "it": "1/4 午餐備選；每天 09:00–21:00", "note": "Kakao ★4.4"}];
+const DAYS={"d1":["1/2","#d1495b"],"d2":["1/3","#2e6fbf"],"d3":["1/4","#1f8a70"],"d4":["1/5","#b07d00"],"d5":["1/6","#7b4fb3"]};
+const CATS={ev:['活動','#5f6b7a','🎉'],shop:['購物','#a8741a','🛍'],food:['餐廳','#c2185b','🍴']};
 const sec=document.getElementById('map');if(!window.L||!sec)return;
-const bar=sec.querySelector('.mapbar');Object.entries(DAYS).forEach(([k,[lab,c]])=>{const b=document.createElement('button');b.type='button';b.className='mchip';b.dataset.d=k;b.style.setProperty('--c',c);b.textContent=lab;b.setAttribute('aria-pressed','false');bar.appendChild(b)});
+const bar=sec.querySelector('.mapbar');
+Object.entries(DAYS).forEach(([k,[lab,c]])=>{const b=document.createElement('button');b.type='button';b.className='mchip';b.dataset.d=k;b.style.setProperty('--c',c);b.textContent=lab;b.setAttribute('aria-pressed','false');bar.appendChild(b)});
+const cbar=document.createElement('div');cbar.className='mcats';cbar.setAttribute('role','group');cbar.setAttribute('aria-label','顯示候選地點');bar.appendChild(cbar);
+Object.entries(CATS).forEach(([k,[lab,c,e]])=>{const b=document.createElement('button');b.type='button';b.className='mchip mcat';b.dataset.c=k;b.style.setProperty('--c',c);b.textContent=e+' '+lab;b.setAttribute('aria-pressed','false');cbar.appendChild(b)});
+let on={ev:false,shop:false,food:false};try{const v=JSON.parse(localStorage.getItem('seoul-mapcats')||'{}');Object.keys(on).forEach(k=>{if(v[k]===true)on[k]=true})}catch(e){}
 const map=L.map('leaf',{zoomSnap:0.5,minZoom:8,maxZoom:17,maxBounds:[[37.2,126.1],[38.0,127.8]]});
 map.attributionControl.setPrefix(false);
 L.tileLayer('tiles/{z}/{x}/{y}.png',{minZoom:8,maxZoom:17,maxNativeZoom:14,errorTileUrl:'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',attribution:'地圖 © OpenStreetMap contributors'}).addTo(map);
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const groups={},items=[];
+const nv=id=>'https://map.naver.com/p/entry/place/'+id;
+const MAXZ=17,PX=26;
+const lines={},items=[];
 Object.keys(DAYS).forEach(k=>{const ps=PTS.filter(p=>p.d===k),c=DAYS[k][1],g=L.layerGroup();
-  if(k!=='ev'&&ps.length>1)L.polyline(ps.map(p=>[p.lat,p.lon]),{color:c,weight:2.5,opacity:.75,dashArray:'6 6'}).addTo(g);
-  ps.forEach((p,i)=>{const ic=L.divIcon({className:'mk',html:`<span style="background:${c}">${i+1}</span>`,iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-12]});
-    const m=L.marker([p.lat,p.lon],{icon:ic,title:p.n,keyboard:true}).bindPopup(`<b>${esc(DAYS[k][0])}・${esc(p.t)}</b><br>${esc(p.n)}${p.note?`<br><small>${esc(p.note)}</small>`:''}<br><a href="https://map.naver.com/p/entry/place/${p.id}" target="_blank" rel="noopener">Naver 地圖</a>`);
-    m.addTo(g);items.push({k,i,p,m,c});});
-  groups[k]=g;});
+  if(ps.length>1)L.polyline(ps.map(p=>[p.lat,p.lon]),{color:c,weight:2.5,opacity:.75,dashArray:'6 6',interactive:false}).addTo(g);
+  lines[k]=g;ps.forEach((p,i)=>items.push({t:'i',k,i,p,c}));});
+const citems=CANDS.map((p,j)=>({t:'c',j,k:p.c,p,c:CATS[p.c][1]}));
+const popOf=x=>x.t==='c'
+  ?`<b>${CATS[x.k][2]} ${esc(x.p.n)}</b><br>${esc(x.p.it)}${x.p.note?`<br><small>${esc(x.p.note)}</small>`:''}<br><a href="${nv(x.p.id)}" target="_blank" rel="noopener">Naver 地圖</a>`
+  :`<b>${esc(DAYS[x.k][0])}・${esc(x.p.t)}</b><br>${esc(x.p.n)}${x.p.note?`<br><small>${esc(x.p.note)}</small>`:''}<br><a href="${nv(x.p.id)}" target="_blank" rel="noopener">Naver 地圖</a>`;
+const face=x=>x.t==='c'?`<span style="background:${x.c}">${CATS[x.k][2]}</span>`:`<span style="background:${x.c}">${x.i+1}</span>`;
+const mkLayer=L.layerGroup().addTo(map);const where=new Map();
+let cur='all';
+function visible(){return items.filter(x=>cur==='all'||x.k===cur).concat(citems.filter(x=>on[x.k]))}
+function draw(){mkLayer.clearLayers();where.clear();const z=map.getZoom();const cl=[];
+  visible().forEach(x=>{const pt=map.project([x.p.lat,x.p.lon],z);const c=cl.find(c=>c.pt.distanceTo(pt)<PX);if(c)c.m.push(x);else cl.push({pt,m:[x]})});
+  cl.forEach(c=>{const n=c.m.length;
+    if(n===1||z>=MAXZ){c.m.forEach((x,idx)=>{let o=[0,0];if(n>1){const a=2*Math.PI*idx/n-Math.PI/2,R=Math.max(18,n*7);o=[Math.round(Math.cos(a)*R),Math.round(Math.sin(a)*R)]}
+        const ic=L.divIcon({className:'mk'+(x.t==='c'?' cand':''),html:face(x),iconSize:[26,26],iconAnchor:[13-o[0],13-o[1]],popupAnchor:[o[0],o[1]-12]});
+        const m=L.marker([x.p.lat,x.p.lon],{icon:ic,title:x.p.n,keyboard:true}).bindPopup(popOf(x),{maxWidth:280});m.addTo(mkLayer);where.set(x,m)})}
+    else{const f=c.m[0];const bb=L.latLngBounds(c.m.map(x=>[x.p.lat,x.p.lon]));
+      const ic=L.divIcon({className:'mk'+(f.t==='c'?' cand':''),html:face(f)+`<b class="badge">${n}</b>`,iconSize:[26,26],iconAnchor:[13,13]});
+      const m=L.marker([f.p.lat,f.p.lon],{icon:ic,title:n+' 個地點重疊，點一下放大',keyboard:true,zIndexOffset:200}).on('click',()=>{if(bb.getNorthEast().equals(bb.getSouthWest()))map.flyTo(bb.getCenter(),MAXZ,{duration:.6});else map.flyToBounds(bb,{maxZoom:MAXZ,padding:[70,70],duration:.6})});
+      m._cl=true;m.addTo(mkLayer);c.m.forEach(x=>where.set(x,m))}});}
+map.on('zoomend',draw);
+function focus(x){const open=()=>{const m=where.get(x);if(!m)return;if(m._cl&&map.getZoom()<MAXZ){map.once('moveend',open);map.flyTo([x.p.lat,x.p.lon],MAXZ,{duration:.5})}else if(!m._cl)m.openPopup()};
+  const z=Math.max(map.getZoom(),14);document.getElementById('leaf').scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(map.getZoom()===z&&map.getCenter().distanceTo([x.p.lat,x.p.lon])<5)open();else{map.once('moveend',open);map.flyTo([x.p.lat,x.p.lon],z,{duration:.6})}}
 const list=document.getElementById('maplist');
-function render(sel){Object.entries(groups).forEach(([k,g])=>{if(sel==='all'||sel===k)g.addTo(map);else map.removeLayer(g)});
+function render(sel,keep){cur=sel;Object.entries(lines).forEach(([k,g])=>{if(sel==='all'||sel===k)g.addTo(map);else map.removeLayer(g)});
   const vis=items.filter(x=>sel==='all'||x.k===sel);
-  list.innerHTML=vis.map(x=>`<li><button type="button" data-j="${items.indexOf(x)}"><span class="no" style="background:${x.c}">${x.i+1}</span><span class="dt">${esc(DAYS[x.k][0])} ${esc(x.p.t)}</span><span class="nm">${esc(x.p.n)}</span></button></li>`).join('');
-  const b=L.latLngBounds(vis.map(x=>[x.p.lat,x.p.lon]));if(b.isValid())map.fitBounds(b,{padding:[28,28],maxZoom:14});
-  bar.querySelectorAll('.mchip').forEach(c=>{const on=c.dataset.d===sel;c.classList.toggle('on',on);c.setAttribute('aria-pressed',on)});
-  try{localStorage.setItem('seoul-mapday',sel)}catch(e){}}
-bar.addEventListener('click',e=>{const b=e.target.closest('.mchip');if(b)render(b.dataset.d)});
-list.addEventListener('click',e=>{const b=e.target.closest('button[data-j]');if(!b)return;const x=items[+b.dataset.j];map.flyTo([x.p.lat,x.p.lon],14,{duration:.6});x.m.openPopup();document.getElementById('leaf').scrollIntoView({block:'nearest',behavior:'smooth'})});
+  let h=vis.map(x=>`<li><button type="button" data-j="${items.indexOf(x)}"><span class="no" style="background:${x.c}">${x.i+1}</span><span class="dt">${esc(DAYS[x.k][0])} ${esc(x.p.t)}</span><span class="nm">${esc(x.p.n)}</span></button></li>`).join('');
+  Object.entries(CATS).forEach(([k,[lab,c,e]])=>{if(!on[k])return;h+=`<li class="sh">${e} ${lab}候選</li>`+citems.filter(x=>x.k===k).map(x=>`<li><button type="button" data-c="${x.j}"><span class="no sq" style="background:${c}">${e}</span><span class="nm">${esc(x.p.n)}<br><small>${esc(x.p.it)}</small></span></button></li>`).join('')});
+  list.innerHTML=h;
+  bar.querySelectorAll('.mchip[data-d]').forEach(c=>{const a=c.dataset.d===sel;c.classList.toggle('on',a);c.setAttribute('aria-pressed',a)});
+  cbar.querySelectorAll('.mcat').forEach(c=>{const a=on[c.dataset.c];c.classList.toggle('on',a);c.setAttribute('aria-pressed',a)});
+  try{localStorage.setItem('seoul-mapday',sel)}catch(e){}
+  const b=L.latLngBounds(vis.map(x=>[x.p.lat,x.p.lon]).concat(sel==='all'?citems.filter(x=>on[x.k]).map(x=>[x.p.lat,x.p.lon]):[]));
+  draw();if(!keep&&b.isValid())map.fitBounds(b,{padding:[28,28],maxZoom:14});}
+bar.addEventListener('click',e=>{const b=e.target.closest('.mchip');if(!b)return;
+  if(b.dataset.c){on[b.dataset.c]=!on[b.dataset.c];try{localStorage.setItem('seoul-mapcats',JSON.stringify(on))}catch(e){};render(cur,true)}else render(b.dataset.d)});
+list.addEventListener('click',e=>{const bc=e.target.closest('button[data-c]');if(bc){focus(citems[+bc.dataset.c]);return}
+  const b=e.target.closest('button[data-j]');if(b)focus(items[+b.dataset.j])});
 let first='all';try{const v=localStorage.getItem('seoul-mapday');if(v&&(v==='all'||DAYS[v]))first=v}catch(e){}
 render(first);
 })();
