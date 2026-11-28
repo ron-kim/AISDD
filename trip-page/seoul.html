@@ -424,7 +424,7 @@ footer ul{margin:0;padding-left:20px}
     <div class="mapbtns" role="group" aria-label="地圖範圍">
       <button type="button" data-v="city" class="on">市區</button><button type="button" data-v="inspire">往 INSPIRE</button><button type="button" data-v="nami">南怡島</button><button type="button" data-v="all">全部</button>
     </div>
-    <div class="mapbox glass"><div id="leafmap" aria-label="行程地點地圖"></div><div class="mapnote" id="mapnote" hidden>底圖載入失敗，標記仍可點選。</div></div>
+    <div class="mapbox glass"><div id="leafmap" aria-label="行程地點地圖"></div><div class="mapnote" id="mapnote" hidden>這個範圍沒有底圖，標記仍可點選。</div></div>
     <ul class="maplegend">
       <li><i class="mk m-stay"></i>住宿</li><li><i class="mk m-move"></i>交通</li><li><i class="mk m-concert"></i>演唱會</li><li><i class="mk m-see"></i>景點・活動</li><li><i class="mk m-food"></i>餐廳</li>
     </ul>
@@ -724,9 +724,9 @@ footer ul{margin:0;padding-left:20px}
   if (!window.L) return;
   var P = [{"c": "stay", "n": "ONU STAY 益善（住宿）", "lat": 37.573848, "lng": 126.9910133, "id": 1304323555, "t": "鐘路3街站約 400 m"}, {"c": "move", "n": "金浦機場國際線", "lat": 37.5660275, "lng": 126.800904, "id": 18952275, "t": "1/2 12:50 抵達、1/6 20:15 起飛；5 號線直達住宿"}, {"c": "concert", "n": "INSPIRE Arena（演唱會）", "lat": 37.4666083, "lng": 126.3905461, "id": 1997613956, "t": "1/2 18:00／1/3 17:00"}, {"c": "move", "n": "空港貨物廳舍站（AREX）", "lat": 37.4590672, "lng": 126.4775041, "id": 13479777, "t": "2 號出口搭 INSPIRE 接駁車"}, {"c": "move", "n": "加平站（京春線・ITX）", "lat": 37.8145183, "lng": 127.5107311, "id": 13590931, "t": "1/4 09:19 到；回程 ITX 16:22"}, {"c": "see", "n": "南怡島碼頭", "lat": 37.803657, "lng": 127.5259961, "id": 19147670, "t": "1/4 渡輪；門票 ₩19,000 含來回"}, {"c": "food", "n": "남이섬꼬꼬춘천닭갈비", "lat": 37.8059024, "lng": 127.5249167, "id": 11822730, "t": "1/4 午餐；週一 09:30–20:00"}, {"c": "see", "n": "清溪廣場（首爾燈節起點）", "lat": 37.569166, "lng": 126.9777119, "id": 13543936, "t": "燈節 18:00–23:00"}, {"c": "see", "n": "三一橋（燈節終點）", "lat": 37.5681609, "lng": 126.9875799, "id": 18689313, "t": "走回住宿約 10 分"}, {"c": "see", "n": "光化門廣場（首爾之光）", "lat": 37.5740533, "lng": 126.9768908, "id": 13349962, "t": "到 1/10；外牆秀到 1/3"}, {"c": "see", "n": "首爾廣場溜冰場", "lat": 37.5657379, "lng": 126.9779487, "id": 11796247, "t": "₩1,000（去年價格）"}, {"c": "see", "n": "石村湖燈光節", "lat": 37.5095249, "lng": 127.102135, "id": 13491520, "t": "17:30–22:30"}, {"c": "see", "n": "樂天城聖誕市集（World Park）", "lat": 37.5125701, "lng": 127.1025624, "id": 35306752, "t": "到 1/3"}, {"c": "food", "n": "Mr박의돈워리（烤肉，候選）", "lat": 37.5697094, "lng": 127.0323763, "id": 35451955, "t": "週一公休；未達 300 則"}, {"c": "move", "n": "鐘閣站", "lat": 37.5701803, "lng": 126.9830713, "id": 13479323, "t": "1 號線往首爾站、清涼里"}];
   var C = {stay:'#e34948',move:'#2a78d6',concert:'#6250d6',see:'#eda100',food:'#1baf7a'};
-  var map = L.map('leafmap', {zoomControl:true, scrollWheelZoom:false, tap:true});
+  var map = L.map('leafmap', {zoomControl:true, scrollWheelZoom:false, tap:true, minZoom:9, maxZoom:16});
   var fails = 0, loaded = 0;
-  var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18, attribution:'&copy; OpenStreetMap'}).addTo(map);
+  var tiles = L.tileLayer('tiles/{z}/{x}/{y}.png', {minZoom:9, maxZoom:16, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
   tiles.on('tileerror', function(){ fails++; if (fails > 3 && !loaded) document.getElementById('mapnote').hidden = false; });
   tiles.on('tileload', function(){ loaded++; document.getElementById('mapnote').hidden = true; });
   function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
